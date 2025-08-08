@@ -1,0 +1,339 @@
+# Enhanced tasks.yaml - Professional Investment Analysis Workflow
+
+normalize_smallcap_data:
+  description: >
+    Execute comprehensive data quality assurance on the small-cap universe dataset following 
+    institutional investment standards. Perform the following data integrity procedures:
+    
+    1. TICKER SYMBOL VALIDATION:
+       - Cross-reference against major exchanges (NASDAQ, NYSE, NYSE American)
+       - Identify and flag ticker symbol changes, mergers, delistings
+       - Resolve duplicate entries caused by corporate actions or symbol migrations
+       - Validate trading status (active vs suspended vs delisted)
+    
+    2. MARKET CAPITALIZATION VERIFICATION:
+       - Recalculate market cap using shares outstanding × current price
+       - Flag discrepancies > 5% between reported and calculated values
+       - Identify potential data staleness issues
+       - Convert all values to USD using current exchange rates if needed
+    
+    3. SECTOR CLASSIFICATION STANDARDIZATION:
+       - Map to GICS (Global Industry Classification Standard) Level 1 sectors
+       - Resolve inconsistencies between different classification systems
+       - Flag companies that may have changed sectors due to business pivots
+       - Ensure sub-$2B market cap threshold compliance for small-cap definition
+    
+    4. DATA COMPLETENESS AUDIT:
+       - Identify missing critical fields (ticker, company name, sector, market cap)
+       - Flag incomplete or suspicious entries for manual review
+       - Calculate data completeness score for each record
+    
+    Apply institutional data quality standards used by firms managing $10B+ in assets.
+    Document all cleaning decisions and maintain audit trail for compliance purposes.
+    
+  expected_output: >
+    Professional-grade clean dataset delivered as:
+    
+    1. PRIMARY OUTPUT: clean_smallcap_universe.csv containing:
+       - Ticker (validated against exchange databases)
+       - Company_Name (standardized format, no special characters)
+       - GICS_Sector (Level 1 classification)
+       - Market_Cap_USD (current, verified values)
+       - Exchange (NASDAQ/NYSE/NYSEAM)
+       - Last_Updated (timestamp of data validation)
+       - Data_Quality_Score (0-100 scale)
+    
+    2. AUDIT DOCUMENTATION: data_cleaning_report.md containing:
+       - Summary statistics (records processed, cleaned, flagged)
+       - List of ticker symbols requiring manual review
+       - Corporate actions identified during cleaning process
+       - Sector reclassification decisions with rationale
+       - Data quality metrics and completeness scores
+    
+    3. EXCEPTION REPORT: flagged_securities.csv containing:
+       - Securities requiring manual analyst review
+       - Reason codes for flagging (stale data, sector uncertainty, etc.)
+       - Recommended follow-up actions
+    
+    Output must meet institutional data governance standards for downstream quantitative analysis.
+
+enrich_with_fundamentals:
+  description: >
+    Execute comprehensive fundamental analysis enrichment for each security in the cleaned dataset
+    following CFA Institute standards and institutional research methodologies. Extract and calculate
+    the following financial metrics categories:
+    
+    1. VALUATION METRICS:
+       - Trailing P/E ratio (with earnings quality assessment)
+       - Forward P/E ratio (using consensus estimates)
+       - PEG ratio (P/E to growth ratio for growth assessment)
+       - Price-to-Book ratio (with tangible book value calculation)
+       - EV/Revenue multiple (enterprise value analysis)
+       - EV/EBITDA multiple (cash flow-based valuation)
+       - Price-to-Sales ratio (revenue multiple analysis)
+    
+    2. PROFITABILITY & EFFICIENCY METRICS:
+       - Gross margin (with 3-year trend analysis)
+       - Operating margin (core business profitability)
+       - Net margin (bottom-line efficiency)
+       - Return on Equity (ROE) with DuPont decomposition
+       - Return on Assets (ROA) for asset utilization
+       - Return on Invested Capital (ROIC) for capital efficiency
+    
+    3. GROWTH METRICS:
+       - Revenue growth (1-year, 3-year CAGR)
+       - Earnings growth (with quality adjustments)
+       - Book value growth per share
+       - Free cash flow growth trends
+    
+    4. BALANCE SHEET STRENGTH:
+       - Current ratio (short-term liquidity)
+       - Quick ratio (conservative liquidity measure)
+       - Debt-to-Equity ratio (leverage analysis)
+       - Interest coverage ratio (debt service capability)
+       - Cash-to-debt ratio (financial flexibility)
+    
+    5. MARKET DYNAMICS & OWNERSHIP:
+       - Beta coefficient (systematic risk measure)
+       - Average daily trading volume (liquidity assessment)
+       - Institutional ownership percentage
+       - Insider ownership percentage
+       - Float percentage (available for trading)
+       - Short interest ratio (sentiment indicator)
+    
+    6. SMALL-CAP SPECIFIC METRICS:
+       - Analyst coverage count (visibility indicator)
+       - Days since last earnings announcement
+       - Revenue concentration (customer/geography)
+       - R&D intensity (innovation investment)
+       - CapEx as % of revenue (growth investment)
+    
+    Flag any metrics that fall outside normal ranges or indicate potential red flags.
+    Calculate sector-relative percentile rankings for key metrics.
+    
+  expected_output: >
+    Institutional-quality fundamental analysis dataset delivered as:
+    
+    1. ENRICHED DATASET: fundamental_metrics.csv containing all base fields plus:
+       - Complete valuation metric suite (7 ratios)
+       - Profitability analysis (6 key metrics)
+       - Growth assessment (4 growth measures)
+       - Balance sheet evaluation (5 strength indicators)
+       - Market dynamics analysis (6 trading/ownership metrics)
+       - Small-cap specific metrics (5 specialized measures)
+       - Sector percentile rankings (relative positioning)
+       - Data freshness timestamps for each metric
+    
+    2. SECTOR COMPARISON ANALYSIS: sector_relative_analysis.csv containing:
+       - Sector median values for all key metrics
+       - Company percentile rankings within sector
+       - Sector premium/discount analysis
+       - Outlier identification (>2 standard deviations)
+    
+    3. RED FLAGS REPORT: risk_indicators.csv containing:
+       - Securities with concerning financial metrics
+       - Specific risk indicators identified
+       - Severity scoring (1-5 scale)
+       - Recommended risk management considerations
+    
+    4. DATA QUALITY ASSESSMENT: metrics_quality_report.md containing:
+       - Completeness statistics for each metric
+       - Data source reliability scores
+       - Confidence intervals for estimated values
+       - Known limitations and caveats
+    
+    All calculations must follow standard financial analysis practices and be auditable.
+
+scan_news_and_sentiment:
+  description: >
+    Execute comprehensive market intelligence gathering and sentiment analysis using advanced
+    natural language processing and alternative data methodologies. Monitor multiple information
+    sources to construct detailed narrative profiles for each security:
+    
+    1. NEWS FLOW ANALYSIS (Past 90 Days):
+       - Financial media coverage (WSJ, Bloomberg, Reuters, MarketWatch)
+       - Earnings call transcripts and management commentary analysis
+       - Regulatory filings and SEC document scanning
+       - Industry trade publication coverage
+       - Press releases and corporate communications
+    
+    2. SENTIMENT QUANTIFICATION:
+       - Professional analyst sentiment (research reports, price target changes)
+       - Retail investor sentiment (social media, trading forums)
+       - News sentiment scoring using NLP algorithms
+       - Management tone analysis from earnings calls
+       - Insider trading activity interpretation
+    
+    3. CATALYST IDENTIFICATION:
+       - Upcoming earnings announcements and guidance
+       - FDA approvals, regulatory decisions (for healthcare/biotech)
+       - Product launches and commercial milestones
+       - M&A rumors and strategic partnership discussions
+       - Patent expirations and intellectual property events
+    
+    4. COMPETITIVE INTELLIGENCE:
+       - Peer company developments affecting competitive position
+       - Market share dynamics and customer wins/losses
+       - Technology disruption threats and opportunities
+       - Supply chain developments and partnerships
+    
+    5. RISK FACTOR MONITORING:
+       - Litigation developments and regulatory investigations
+       - Management turnover and corporate governance issues
+       - Accounting irregularities or audit concerns
+       - Customer concentration risks and key client losses
+       - Environmental, social, governance (ESG) risk factors
+    
+    6. SECTOR THEME ANALYSIS:
+       - Industry tailwinds and headwinds
+       - Regulatory environment changes
+       - Technology adoption trends
+       - Economic cycle positioning
+    
+    Synthesize all information sources to create comprehensive narrative profiles that institutional
+    investors can use for investment decision-making. Focus on actionable intelligence rather than noise.
+    
+  expected_output: >
+    Professional market intelligence package delivered as:
+    
+    1. COMPANY NARRATIVE PROFILES: company_narratives.md containing for each ticker:
+       - Executive summary (2-3 sentences on current situation)
+       - Key developments (past 90 days with dates and sources)
+       - Sentiment analysis (quantified scores and qualitative assessment)
+       - Upcoming catalysts (dates, probabilities, potential impact)
+       - Risk factors (identified concerns with severity ratings)
+       - Competitive positioning (relative to peers)
+       - Investment thesis implications (bull/bear case updates)
+    
+    2. SENTIMENT DASHBOARD: sentiment_metrics.csv containing:
+       - Overall sentiment score (-100 to +100 scale)
+       - News volume trend (3-month moving average)
+       - Professional vs retail sentiment divergence
+       - Sentiment momentum (week-over-week changes)
+       - Source credibility weighting
+    
+    3. CATALYST CALENDAR: upcoming_events.csv containing:
+       - Event dates and types
+       - Expected impact magnitude (low/medium/high)
+       - Probability assessments where applicable
+       - Historical precedent analysis for similar events
+    
+    4. RISK ALERT SUMMARY: risk_monitoring.csv containing:
+       - Active risk factors by company
+       - Risk severity scores (1-5 scale)
+       - Monitoring frequency recommendations
+       - Risk correlation analysis across holdings
+    
+    5. SECTOR INTELLIGENCE BRIEF: sector_themes.md containing:
+       - Prevailing sector narratives and themes
+       - Rotation indicators and institutional flow data
+       - Regulatory and policy impacts
+       - Technology disruption monitoring
+    
+    All intelligence must be sourced, dated, and include confidence assessments for institutional compliance.
+
+generate_alpha_report:
+  description: >
+    Synthesize all fundamental analysis, market intelligence, and quantitative metrics to generate
+    institutional-quality investment recommendations following rigorous portfolio management standards.
+    Execute multi-factor analysis combining quantitative screening with qualitative assessment:
+    
+    1. QUANTITATIVE SCORING MODEL:
+       - Value Score: P/E, P/B, EV/Revenue relative to sector and growth
+       - Quality Score: ROE, margins, debt ratios, earnings stability
+       - Growth Score: Revenue/earnings growth, forward guidance trends
+       - Momentum Score: Price performance, earnings revisions, sentiment
+       - Risk Score: Beta, volatility, balance sheet strength, liquidity
+    
+    2. QUALITATIVE ASSESSMENT FRAMEWORK:
+       - Management quality and track record evaluation
+       - Competitive moats and sustainable advantages
+       - Market opportunity size and addressability
+       - Execution capability and strategic positioning
+       - Corporate governance and capital allocation
+    
+    3. CATALYST-DRIVEN ANALYSIS:
+       - Near-term catalyst probability and impact assessment
+       - Event-driven opportunity identification
+       - Earnings inflection point analysis
+       - Regulatory approval timelines (biotech/pharma)
+       - Strategic transaction likelihood
+    
+    4. RISK-ADJUSTED RETURN ESTIMATION:
+       - 12-month price target methodology
+       - Expected return calculations with confidence intervals
+       - Downside protection analysis and stop-loss levels
+       - Position sizing recommendations based on Kelly Criterion
+       - Correlation analysis for portfolio construction
+    
+    5. INVESTMENT THESIS CONSTRUCTION:
+       - Bull case scenario (probability-weighted)
+       - Base case scenario (most likely outcome)
+       - Bear case scenario (risk assessment)
+       - Key assumptions and sensitivity analysis
+       - Thesis validation metrics and monitoring triggers
+    
+    6. PORTFOLIO CONSTRUCTION CONSIDERATIONS:
+       - Sector allocation recommendations
+       - Market cap distribution optimization
+       - Liquidity requirements and trading considerations
+       - ESG factor integration where relevant
+       - Tax efficiency considerations for different account types
+    
+    Generate actionable investment recommendations that portfolio managers can implement with
+    confidence, including specific entry points, position sizing, and risk management parameters.
+    All recommendations must include supporting rationale and be defensible to investment committees.
+    
+  expected_output: >
+    Institutional-grade investment research report delivered as:
+    
+    1. EXECUTIVE SUMMARY: alpha_executive_summary.md containing:
+       - Top 10 investment recommendations with conviction scores
+       - Portfolio allocation suggestions by sector/theme
+       - Key market themes driving recommendations
+       - Risk budget allocation recommendations
+       - Expected portfolio-level metrics (return, volatility, Sharpe ratio)
+    
+    2. DETAILED INVESTMENT PROFILES: detailed_recommendations.md containing for each recommended security:
+       - Investment thesis (bull/base/bear scenarios)
+       - Quantitative scores (value, quality, growth, momentum, risk)
+       - Financial metrics summary and sector relative positioning
+       - Catalyst timeline and probability assessments
+       - 12-month price target with methodology
+       - Position sizing recommendation (% of portfolio)
+       - Entry strategy and price levels
+       - Risk management parameters (stop losses, monitoring triggers)
+       - Competitive analysis and differentiation factors
+    
+    3. QUANTITATIVE SCREENING RESULTS: screening_output.csv containing:
+       - Complete universe scored on all factors
+       - Composite scores and rankings
+       - Factor decomposition for transparency
+       - Statistical significance of factor loadings
+       - Backtesting results where applicable
+    
+    4. RISK ANALYSIS: portfolio_risk_assessment.md containing:
+       - Portfolio-level risk metrics and stress testing
+       - Sector concentration analysis
+       - Correlation matrix and diversification benefits
+       - Liquidity analysis and trading capacity
+       - Sensitivity analysis to key market factors
+       - ESG risk assessment and integration
+    
+    5. IMPLEMENTATION GUIDE: trading_implementation.md containing:
+       - Recommended order types and execution strategies
+       - Liquidity analysis and market impact estimates
+       - Optimal trading windows and volume constraints
+       - Rebalancing triggers and methodology
+       - Tax-loss harvesting opportunities
+       - Performance attribution framework
+    
+    6. MONITORING FRAMEWORK: ongoing_monitoring.md containing:
+       - Key performance indicators to track
+       - Thesis validation checkpoints
+       - Risk monitoring triggers and escalation procedures
+       - Quarterly review methodology
+       - Exit criteria and profit-taking strategies
+    
+    All recommendations must meet institutional investment standards with proper documentation,
+    risk assessment, and implementation guidance suitable for fiduciary decision-making.
