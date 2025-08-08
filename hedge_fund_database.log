@@ -1,0 +1,536 @@
+2025-08-08 14:31:50,874 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:31:50,875 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data populated successfully
+2025-08-08 14:31:50,875 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:33:01,414 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:33:01,414 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:33:01,414 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:33:01,416 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:33:01,416 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:33:01,417 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:33:01,417 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:33:01,417 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:34:55,662 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:34:55,662 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:34:55,662 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:34:55,665 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:34:55,665 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:34:55,666 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:34:55,666 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:34:55,666 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:34:55,671 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:34:55,671 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:34:55,671 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:34:55,671 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 14:43:49,793 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:43:49,793 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:43:49,793 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:43:49,796 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:43:49,796 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:43:49,797 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:43:49,797 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:43:49,797 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:43:49,803 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:43:49,803 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:43:49,803 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:43:49,803 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 14:45:05,762 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:45:05,762 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:45:05,762 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:45:05,764 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:45:05,764 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:45:05,765 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:45:05,765 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:45:05,765 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:45:05,771 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:45:05,771 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:45:05,772 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:45:05,772 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 14:45:27,851 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:45:27,852 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:45:27,852 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:45:27,854 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:45:27,854 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:45:27,855 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:45:27,855 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:45:27,855 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:45:27,860 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:45:27,860 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:45:27,861 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:45:27,861 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 14:45:27,861 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_144527
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_144527
+2025-08-08 14:45:27,866 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 14:45:27,870 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:45:27,870 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:45:27,871 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:45:27,873 - small_cap_multi_agent_framework.crew - ERROR - Failed to create institutional crew: 1 validation error for Crew
+  Value error, Please provide an OpenAI API key. You can get one at https://platform.openai.com/account/api-keys [type=value_error, input_value={'agents': [Agent(role=Fi...e, 'planning_llm': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/value_error
+2025-08-08 14:45:27,873 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: 1 validation error for Crew
+  Value error, Please provide an OpenAI API key. You can get one at https://platform.openai.com/account/api-keys [type=value_error, input_value={'agents': [Agent(role=Fi...e, 'planning_llm': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/value_error
+2025-08-08 14:55:45,544 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 14:55:45,545 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 14:55:45,545 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 14:55:45,548 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 14:55:45,548 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 14:55:45,549 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'news_scanner'
+2025-08-08 14:55:45,549 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'news_scanner'
+2025-08-08 14:55:45,549 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 14:55:45,555 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:55:45,555 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:55:45,555 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:55:45,555 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 14:55:45,556 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 14:55:45,559 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_145545
+2025-08-08 14:55:45,559 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 14:55:45,559 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 14:55:45,559 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_145545
+2025-08-08 14:55:45,560 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 14:55:45,563 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 14:55:45,563 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 14:55:45,564 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 14:55:45,841 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 14:55:46,086 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 14:55:46,103 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 14:55:46,122 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 14:55:46,123 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 14:55:46,132 - LiteLLM - INFO - 
+LiteLLM completion() model= gpt-4o-mini; provider = openai
+2025-08-08 14:55:46,350 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 404 Not Found"
+2025-08-08 14:55:46,381 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.NotFoundError: OpenAIException - The model `gpt-4o-mini` does not exist or you do not have access to it.
+2025-08-08 15:00:48,387 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:00:48,388 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:00:48,388 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:00:48,543 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:00:48,543 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:00:48,545 - small_cap_multi_agent_framework.config.agents - ERROR - Failed to create professional agents: 'ProfessionalAgentFactory' object has no attribute 'create_news_scanner'
+2025-08-08 15:00:48,545 - small_cap_multi_agent_framework.config.agents - ERROR - Agent initialization failed: 'ProfessionalAgentFactory' object has no attribute 'create_news_scanner'
+2025-08-08 15:00:48,545 - small_cap_multi_agent_framework.config.agents - WARNING - Creating fallback agents without database access
+2025-08-08 15:00:48,550 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:00:48,550 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:00:48,551 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:00:48,551 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:00:48,551 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_150048
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_150048
+2025-08-08 15:00:48,555 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:00:48,559 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:00:48,559 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:00:48,559 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:00:48,657 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:00:48,736 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:00:48,752 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:00:48,755 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:00:48,756 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:00:48,765 - LiteLLM - INFO - 
+LiteLLM completion() model= gpt-4o-mini; provider = openai
+2025-08-08 15:00:48,962 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 404 Not Found"
+2025-08-08 15:00:48,984 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.NotFoundError: OpenAIException - The model `gpt-4o-mini` does not exist or you do not have access to it.
+2025-08-08 15:05:04,225 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:05:04,225 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:05:04,225 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:05:04,376 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:05:04,376 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:05:04,522 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:05:04,522 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:05:04,531 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:05:04,531 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:05:04,531 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:05:04,531 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:05:04,532 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_150504
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_150504
+2025-08-08 15:05:04,539 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:05:04,543 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:05:04,543 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:05:04,543 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:05:04,643 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:05:04,750 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:05:04,766 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:05:04,786 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:05:04,787 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:05:04,795 - LiteLLM - INFO - 
+LiteLLM completion() model= gpt-4o-mini; provider = openai
+2025-08-08 15:05:05,101 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 404 Not Found"
+2025-08-08 15:05:05,136 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.NotFoundError: OpenAIException - The model `gpt-4o-mini` does not exist or you do not have access to it.
+2025-08-08 15:07:44,561 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:07:44,562 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:07:44,562 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:07:44,712 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:07:44,712 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:07:44,859 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:07:44,859 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:07:44,867 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:07:44,867 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:07:44,868 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:07:44,868 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:07:44,868 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_150744
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_150744
+2025-08-08 15:07:44,874 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:07:44,907 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:07:44,907 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:07:44,907 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:07:45,003 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:07:45,079 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:07:45,095 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:07:45,098 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:07:45,099 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:07:45,273 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:07:45,275 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:07:45,379 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:07:45,380 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:07:45,423 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=llama-3.1-70b-versatile
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+2025-08-08 15:14:46,397 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:14:46,398 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:14:46,398 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:14:46,551 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:14:46,551 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:14:46,700 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:14:46,701 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:14:46,711 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:14:46,711 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:14:46,712 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:14:46,712 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:14:46,713 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_151446
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_151446
+2025-08-08 15:14:46,717 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:14:46,750 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:14:46,750 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:14:46,750 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:14:46,850 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:14:46,936 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:14:46,952 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:14:46,956 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:14:46,957 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:14:47,118 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:14:47,121 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:14:47,204 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:14:47,204 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:14:47,236 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=llama-3.1-70b-versatile
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+2025-08-08 15:18:42,130 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:18:42,130 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:18:42,130 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:18:42,282 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:18:42,282 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:18:42,430 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:18:42,430 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:18:42,439 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:18:42,439 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:18:42,439 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:18:42,439 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:18:42,440 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_151842
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_151842
+2025-08-08 15:18:42,444 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:18:42,479 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:18:42,479 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:18:42,480 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:18:42,574 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:18:42,652 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:18:42,667 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:18:42,670 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:18:42,672 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:18:42,841 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:18:42,842 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:18:42,987 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:18:42,988 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:18:43,026 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=grok/llama-3.1-70b-versatile
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+2025-08-08 15:20:54,508 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:20:54,509 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:20:54,509 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:20:54,659 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:20:54,659 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:20:54,810 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:20:54,810 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:20:54,815 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:20:54,815 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:20:54,815 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:20:54,815 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:20:54,816 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_152054
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_152054
+2025-08-08 15:20:54,823 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:20:54,856 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:20:54,856 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:20:54,857 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:20:54,954 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:20:55,031 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:20:55,046 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:20:55,049 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:20:55,050 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:20:55,230 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:20:55,232 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:20:55,379 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:20:55,380 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:20:55,402 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.1-70b-versatile; provider = groq
+2025-08-08 15:20:55,618 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-08-08 15:20:55,649 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.BadRequestError: GroqException - {"error":{"message":"The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.","type":"invalid_request_error","code":"model_decommissioned"}}
+
+2025-08-08 15:23:46,403 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:23:46,403 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:23:46,403 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:23:46,553 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:23:46,553 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:23:46,702 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:23:46,702 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:23:46,707 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:23:46,707 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:23:46,707 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:23:46,707 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:23:46,708 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:23:46,715 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_152346
+2025-08-08 15:23:46,715 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:23:46,715 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:23:46,715 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:23:46,715 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:23:46,716 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:23:46,716 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:23:46,716 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:23:46,716 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_152346
+2025-08-08 15:23:46,716 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:23:46,748 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:23:46,748 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:23:46,748 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:23:46,845 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:23:46,922 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:23:46,937 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:23:46,940 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:23:46,941 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:23:47,129 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:47,131 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:47,266 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:47,267 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:47,293 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:23:49,294 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:23:49,297 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:23:49,500 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:49,501 - root - ERROR - Error during short_term save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:50,721 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:23:51,702 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:23:51,706 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:23:51,821 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:51,822 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:51,934 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:51,936 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:52,032 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:52,034 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:52,141 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:52,142 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:52,245 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:23:52,245 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:23:52,262 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:24:37,576 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:24:37,582 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:24:37,609 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 15:24:37,618 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:24:37,693 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-08-08 15:24:37,720 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.RateLimitError: RateLimitError: GroqException - {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01k25ge6g5ffwstjzmwn3n0bam` service tier `on_demand` on tokens per minute (TPM): Limit 12000, Used 11975, Requested 2720. Please try again in 13.472s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2025-08-08 15:24:50,740 - crewai.telemetry.telemetry - ERROR - HTTPSConnectionPool(host='telemetry.crewai.com', port=4319): Max retries exceeded with url: /v1/traces (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x11a2d4c50>, 'Connection to telemetry.crewai.com timed out. (connect timeout=29.999995946884155)'))
+2025-08-08 15:59:42,698 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 15:59:42,699 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 15:59:42,699 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 15:59:42,851 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 15:59:42,851 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 15:59:42,998 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 15:59:42,998 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 15:59:43,003 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:59:43,003 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:59:43,004 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:59:43,004 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 15:59:43,005 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_155943
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_155943
+2025-08-08 15:59:43,012 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 15:59:43,045 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 15:59:43,045 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 15:59:43,046 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 15:59:43,152 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:59:43,229 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 15:59:43,245 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 15:59:43,248 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 15:59:43,249 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 15:59:43,501 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:43,504 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:43,616 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:43,618 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:43,640 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:59:46,507 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:59:46,510 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:59:46,611 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:46,612 - root - ERROR - Error during short_term save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:46,952 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:59:47,770 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:59:47,775 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:59:47,858 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:47,859 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:47,919 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:47,921 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:48,110 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:48,112 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:48,171 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 15:59:48,173 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 15:59:48,188 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 15:59:54,204 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 15:59:54,211 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 15:59:54,233 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 15:59:54,243 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 16:00:03,594 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 16:00:03,595 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 16:00:03,607 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 16:00:03,613 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 16:00:03,713 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-08-08 16:00:03,738 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.RateLimitError: RateLimitError: GroqException - {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01k25ge6g5ffwstjzmwn3n0bam` service tier `on_demand` on tokens per minute (TPM): Limit 12000, Used 10198, Requested 2790. Please try again in 4.937s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2025-08-08 17:29:04,613 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Database schema created successfully
+2025-08-08 17:29:04,613 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Sample data already exists, skipping population
+2025-08-08 17:29:04,613 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Hedge Fund Database System initialized at data/hedge_fund_database.db
+2025-08-08 17:29:04,762 - small_cap_multi_agent_framework.config.agents - INFO - Loaded agent configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/agents.yaml
+2025-08-08 17:29:04,762 - small_cap_multi_agent_framework.config.agents - INFO - Professional agent factory initialized
+2025-08-08 17:29:04,906 - small_cap_multi_agent_framework.config.agents - INFO - All professional agents created successfully
+2025-08-08 17:29:04,906 - small_cap_multi_agent_framework.config.agents - INFO - Professional agents ready for deployment
+2025-08-08 17:29:04,911 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 17:29:04,911 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 17:29:04,911 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 17:29:04,911 - small_cap_multi_agent_framework.config.tasks - INFO - Professional tasks ready for deployment
+2025-08-08 17:29:04,912 - __main__ - INFO - Small Cap Multi-Agent Framework v1.0.0 initialized
+2025-08-08 17:29:04,919 - small_cap_multi_agent_framework.crew - INFO - Institutional Analysis Crew initialized - Execution ID: 20250808_172904
+2025-08-08 17:29:04,919 - small_cap_multi_agent_framework.crew - INFO - Validating hedge fund database system...
+2025-08-08 17:29:04,919 - small_cap_multi_agent_framework.crew - INFO - Validating professional agents...
+2025-08-08 17:29:04,919 - small_cap_multi_agent_framework.crew - INFO - ✅ System health check passed - Ready for institutional analysis
+2025-08-08 17:29:04,919 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 17:29:04,920 - small_cap_multi_agent_framework.crew - INFO - STARTING INSTITUTIONAL INVESTMENT ANALYSIS
+2025-08-08 17:29:04,920 - small_cap_multi_agent_framework.crew - INFO - Input File: data/small_caps_input.csv
+2025-08-08 17:29:04,920 - small_cap_multi_agent_framework.crew - INFO - Analysis Date: 2025-08-08
+2025-08-08 17:29:04,920 - small_cap_multi_agent_framework.crew - INFO - Execution ID: 20250808_172904
+2025-08-08 17:29:04,920 - small_cap_multi_agent_framework.crew - INFO - ================================================================================
+2025-08-08 17:29:04,953 - small_cap_multi_agent_framework.config.tasks - INFO - Loaded task configuration from /Users/ethanhod/small-cap-multi-agent-framework/src/small_cap_multi_agent_framework/config/tasks.yaml
+2025-08-08 17:29:04,953 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task factory initialized
+2025-08-08 17:29:04,953 - small_cap_multi_agent_framework.config.tasks - INFO - Professional task workflow created successfully
+2025-08-08 17:29:05,051 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 17:29:05,130 - root - INFO - Collection found or created: Collection(name=short_term)
+2025-08-08 17:29:05,146 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-08 17:29:05,149 - root - INFO - Collection found or created: Collection(name=entities)
+2025-08-08 17:29:05,150 - small_cap_multi_agent_framework.crew - INFO - Institutional analysis crew created successfully
+2025-08-08 17:29:05,331 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:05,333 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:05,455 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:05,456 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:05,482 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:07,912 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 17:29:07,916 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 17:29:08,035 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:08,037 - root - ERROR - Error during short_term save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:08,364 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:09,171 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 17:29:09,176 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 17:29:09,239 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:09,240 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:09,571 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:09,573 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:09,659 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:09,661 - root - ERROR - Error during entities save: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:09,739 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:09,740 - root - ERROR - Error during short_term search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:09,814 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-08-08 17:29:09,815 - root - ERROR - Error during entities search: APIStatusError.__init__() missing 2 required keyword-only arguments: 'response' and 'body'
+2025-08-08 17:29:09,828 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:16,533 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 17:29:16,537 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 17:29:16,555 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 17:29:16,564 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:24,077 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 17:29:24,080 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 17:29:24,095 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 17:29:24,105 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:35,067 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-08 17:29:35,071 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-08-08 17:29:35,085 - small_cap_multi_agent_framework.tools.hedge_fund_database - INFO - Query executed successfully, returned 0 rows
+2025-08-08 17:29:35,094 - LiteLLM - INFO - 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2025-08-08 17:29:35,171 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-08-08 17:29:35,198 - small_cap_multi_agent_framework.crew - ERROR - Institutional analysis failed: litellm.RateLimitError: RateLimitError: GroqException - {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01k25ge6g5ffwstjzmwn3n0bam` service tier `on_demand` on tokens per minute (TPM): Limit 12000, Used 12390, Requested 3111. Please try again in 17.506s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
