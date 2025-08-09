@@ -1,15 +1,15 @@
 """
-Institutional Crew System - Complete Hedge Fund Workflow
-========================================================
+Institutional Crew System - Simplified with Basic Rate Limiting
+==============================================================
 
 Orchestrates the complete institutional investment analysis workflow using
-professional agents with database access, mirroring real hedge fund operations.
+professional agents with simple, reliable rate limiting.
 
 Author: Small Cap Multi-Agent Framework
 License: MIT
 """
 
-from crewai import Crew, Process
+from crewai import Crew, Process, LLM
 from small_cap_multi_agent_framework.config.agents import (
     data_cleaner, data_enricher, news_scanner, alpha_analyst
 )
@@ -21,6 +21,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import os
+import time
 from dotenv import load_dotenv
 
 # Load environment and force Groq configuration globally
@@ -30,9 +31,6 @@ load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("GROQ_API_KEY")
 os.environ["OPENAI_API_BASE"] = "https://api.groq.com/openai/v1"
 os.environ["OPENAI_MODEL_NAME"] = "groq/llama-3.3-70b-versatile"
-
-# Also set LiteLLM environment variables
-os.environ["LITELLM_LOG"] = "INFO"
 
 # Configure professional logging
 logging.basicConfig(
@@ -47,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 class InstitutionalAnalysisCrew:
     """
-    Institutional-grade investment analysis crew orchestrating hedge fund workflows.
+    Institutional-grade investment analysis crew with simple rate limiting.
     
     Replicates the research process used by professional asset management firms:
     1. Data Quality Assurance (Junior Analyst Level)
@@ -63,7 +61,7 @@ class InstitutionalAnalysisCrew:
         self.output_dir = Path("output")
         self.output_dir.mkdir(exist_ok=True)
         
-        logger.info(f"Institutional Analysis Crew initialized - Execution ID: {self.execution_id}")
+        logger.info(f"Institutional Analysis Crew with simple rate limiting initialized - Execution ID: {self.execution_id}")
         self._validate_system_health()
     
     def _validate_system_health(self):
@@ -81,44 +79,43 @@ class InstitutionalAnalysisCrew:
                 if not hasattr(agent, 'role'):
                     raise Exception(f"Agent validation failed: {agent}")
             
-            logger.info("✅ System health check passed - Ready for institutional analysis")
+            logger.info("✅ System health check passed - Ready for institutional analysis with simple rate limiting")
             
         except Exception as e:
             logger.error(f"❌ System health check failed: {str(e)}")
             raise
     
     def create_institutional_crew(self) -> Crew:
-        """Create institutional analysis crew with professional workflow."""
+        """Create institutional analysis crew with professional workflow and simple rate limiting."""
         
         try:
-            from langchain_groq import ChatGroq
-            
-            # Configure Groq LLM explicitly for ALL crew operations
-            groq_llm = ChatGroq(
+            # Create simple manager LLM using CrewAI's LLM class
+            manager_llm = LLM(
                 model="groq/llama-3.3-70b-versatile",
                 temperature=0.1,
-                max_tokens=None,
-                timeout=None,
-                max_retries=2,
+                max_tokens=1000,
                 api_key=os.getenv("GROQ_API_KEY")
             )
             
             # Create professional task workflow
             tasks = create_professional_task_workflow(self.input_file)
             
-            # Create institutional crew with explicit Groq configuration
+            # Add delay before crew creation
+            time.sleep(2)
+            
+            # Create institutional crew
             crew = Crew(
                 agents=[data_cleaner, data_enricher, news_scanner, alpha_analyst],
                 tasks=tasks,
-                process=Process.sequential,  # Institutional workflow requires sequential analysis
+                process=Process.sequential,  # Sequential analysis
                 verbose=True,
                 memory=True,
-                manager_llm=groq_llm,  # Use Groq for manager
+                manager_llm=manager_llm,
                 planning=False,  # Turn off planning to avoid model conflicts
-                planning_llm=None  # No planning LLM
+                planning_llm=None
             )
             
-            logger.info("Institutional analysis crew created successfully")
+            logger.info("Institutional analysis crew created successfully with simple rate limiting")
             return crew
             
         except Exception as e:
@@ -126,7 +123,7 @@ class InstitutionalAnalysisCrew:
             raise
     
     def execute_institutional_analysis(self, inputs: dict = None) -> dict:
-        """Execute complete institutional investment analysis workflow."""
+        """Execute complete institutional investment analysis workflow with simple rate limiting."""
         
         if inputs is None:
             inputs = {
@@ -137,14 +134,24 @@ class InstitutionalAnalysisCrew:
         
         try:
             logger.info("=" * 80)
-            logger.info("STARTING INSTITUTIONAL INVESTMENT ANALYSIS")
+            logger.info("STARTING INSTITUTIONAL INVESTMENT ANALYSIS WITH SIMPLE RATE LIMITING")
             logger.info(f"Input File: {inputs['input_file']}")
             logger.info(f"Analysis Date: {inputs['analysis_date']}")
             logger.info(f"Execution ID: {inputs['execution_id']}")
             logger.info("=" * 80)
             
+            # Add initial delay to prevent immediate rate limiting
+            logger.info("⏳ Initializing with rate limiting buffer...")
+            time.sleep(5)
+            
             # Create and execute crew
             self.crew = self.create_institutional_crew()
+            
+            logger.info("🚀 Starting crew execution with simple rate limiting...")
+            
+            # Add another delay before kickoff
+            time.sleep(3)
+            
             result = self.crew.kickoff(inputs=inputs)
             
             # Generate execution summary
@@ -164,10 +171,20 @@ class InstitutionalAnalysisCrew:
             }
             
         except Exception as e:
-            logger.error(f"Institutional analysis failed: {str(e)}")
+            error_msg = str(e)
+            logger.error(f"Institutional analysis failed: {error_msg}")
+            
+            # Check if it's a rate limit error and provide helpful guidance
+            if any(term in error_msg.lower() for term in ["rate_limit", "rate limit", "too many requests"]):
+                logger.error("📊 RATE LIMIT GUIDANCE:")
+                logger.error("   1. Wait 60 seconds and try again")
+                logger.error("   2. Consider upgrading to Groq Dev Tier")
+                logger.error("   3. Use smaller models for non-critical tasks")
+                logger.error("   4. Reduce max_tokens in agent configurations")
+            
             return {
                 'status': 'failed',
-                'error': str(e),
+                'error': error_msg,
                 'execution_id': self.execution_id
             }
     
@@ -191,7 +208,8 @@ class InstitutionalAnalysisCrew:
                 'execution_time': 'Completed',
                 'database_queries': 'Multiple institutional database queries executed',
                 'compliance_status': 'Audit trail maintained',
-                'system_health': 'All systems operational'
+                'system_health': 'All systems operational with simple rate limiting',
+                'rate_limiting': 'Enabled - Simple delay-based rate limiting active'
             }
             
             # Save execution summary
@@ -209,7 +227,7 @@ class InstitutionalAnalysisCrew:
 
 def run_institutional_analysis(input_file: str = "data/small_caps_input.csv"):
     """
-    Main entry point for institutional investment analysis.
+    Main entry point for institutional investment analysis with simple rate limiting.
     
     Args:
         input_file: Path to small-cap dataset for analysis
@@ -219,6 +237,8 @@ def run_institutional_analysis(input_file: str = "data/small_caps_input.csv"):
     """
     
     try:
+        logger.info("🏦 Initializing Institutional Analysis with Simple Rate Limiting...")
+        
         # Initialize institutional analysis crew
         institutional_crew = InstitutionalAnalysisCrew(input_file)
         
@@ -230,6 +250,7 @@ def run_institutional_analysis(input_file: str = "data/small_caps_input.csv"):
             print(f"📊 Execution ID: {results['execution_id']}")
             print(f"📁 Output Files: {len(results['summary']['output_files'])} reports generated")
             print(f"✅ System Status: All institutional systems operational")
+            print(f"⚡ Rate Limiting: Simple delay-based rate limiting enabled")
             
             # Display output file locations
             print("\n📋 GENERATED REPORTS:")
@@ -239,6 +260,14 @@ def run_institutional_analysis(input_file: str = "data/small_caps_input.csv"):
         else:
             print(f"\n❌ INSTITUTIONAL ANALYSIS FAILED")
             print(f"Error: {results['error']}")
+            
+            # Provide rate limit specific guidance
+            if any(term in results['error'].lower() for term in ["rate_limit", "rate limit", "too many requests"]):
+                print("\n💡 RATE LIMIT RECOVERY SUGGESTIONS:")
+                print("   1. Wait 60 seconds before retrying")
+                print("   2. Consider upgrading to Groq Dev Tier for higher limits")
+                print("   3. Review token usage in agent configurations")
+                print("   4. Use smaller models for data cleaning tasks")
             
         return results
         
@@ -250,6 +279,7 @@ def run_institutional_analysis(input_file: str = "data/small_caps_input.csv"):
 if __name__ == "__main__":
     # System health check and demonstration
     print("🏦 HEDGE FUND MULTI-AGENT ANALYSIS SYSTEM")
+    print("🔧 Enhanced with Simple Rate Limiting")
     print("=" * 50)
     print("Initializing institutional-grade investment analysis...")
     
@@ -258,6 +288,8 @@ if __name__ == "__main__":
     
     if results['status'] == 'success':
         print("\n🎉 Demo completed successfully!")
-        print("Ready for production institutional analysis.")
+        print("Ready for production institutional analysis with simple rate limiting.")
     else:
         print(f"\n⚠️  Demo failed: {results.get('error', 'Unknown error')}")
+        if any(term in str(results.get('error', '')).lower() for term in ["rate_limit", "rate limit"]):
+            print("\n⏰ Tip: Wait a minute and try again, or upgrade your Groq tier.")
