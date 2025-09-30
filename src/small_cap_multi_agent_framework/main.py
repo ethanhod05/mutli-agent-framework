@@ -2,9 +2,8 @@
 Small Cap Multi-Agent Framework - Main Execution Script
 ======================================================
 
-Professional entry point for institutional-grade small-cap investment analysis.
-Orchestrates the complete hedge fund research workflow from data ingestion
-to actionable investment recommendations.
+Professional entry point for institutional-grade small-cap investment analysis
+using GPT-5-mini powered agents.
 
 Author: Small Cap Multi-Agent Framework
 License: MIT
@@ -16,6 +15,10 @@ from pathlib import Path
 import logging
 from datetime import datetime
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
@@ -24,10 +27,10 @@ from small_cap_multi_agent_framework.crew import run_institutional_analysis
 from small_cap_multi_agent_framework.tools.hedge_fund_database import hedge_fund_db
 import pandas as pd
 
-# Configure professional logging
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('small_cap_analysis.log'),
         logging.StreamHandler()
@@ -45,13 +48,50 @@ class SmallCapAnalysisSystem:
     
     def __init__(self):
         self.system_start_time = datetime.now()
-        self.version = "1.0.0"
+        self.version = "2.0.0"  # Updated for GPT-5-mini
+        self.model = self._detect_model()
         logger.info(f"Small Cap Multi-Agent Framework v{self.version} initialized")
+        logger.info(f"Using model: {self.model}")
+    
+    def _detect_model(self) -> str:
+        """Detect which GPT model is available."""
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            
+            # Try GPT-5-mini first
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-5-mini",
+                    messages=[{"role": "user", "content": "test"}],
+                    max_tokens=1
+                )
+                return "gpt-5-mini"
+            except:
+                # Fallback to gpt-4o-mini
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[{"role": "user", "content": "test"}],
+                        max_tokens=1
+                    )
+                    return "gpt-4o-mini"
+                except:
+                    return "Model detection failed"
+        except:
+            return "OpenAI API not configured"
     
     def validate_environment(self) -> bool:
         """Validate system environment and dependencies."""
         try:
             print("🔍 VALIDATING SYSTEM ENVIRONMENT...")
+            
+            # Check API key
+            if not os.getenv("OPENAI_API_KEY"):
+                print("   ❌ OPENAI_API_KEY not found in .env file")
+                print("   Please add: OPENAI_API_KEY=sk-your-key-here")
+                return False
+            print("   ✅ OpenAI API key found")
             
             # Check required directories
             required_dirs = ['data', 'output', 'scripts']
@@ -59,12 +99,18 @@ class SmallCapAnalysisSystem:
                 if not Path(dir_name).exists():
                     Path(dir_name).mkdir(exist_ok=True)
                     print(f"   ✅ Created directory: {dir_name}/")
+                else:
+                    print(f"   ✅ Directory exists: {dir_name}/")
             
             # Check database system
             print("   🗄️  Testing hedge fund database connection...")
-            test_conn = hedge_fund_db._get_connection()
-            test_conn.close()
-            print("   ✅ Database system operational")
+            try:
+                test_conn = hedge_fund_db._get_connection()
+                test_conn.close()
+                print("   ✅ Database system operational")
+            except Exception as e:
+                print(f"   ⚠️  Database warning: {str(e)}")
+                print("   Analysis will continue without database tools")
             
             # Check sample data availability
             sample_files = list(Path('data').glob('*.csv'))
@@ -73,6 +119,15 @@ class SmallCapAnalysisSystem:
             else:
                 print("   ⚠️  No CSV files found in data/ directory")
                 self.create_sample_data()
+            
+            # Check model availability
+            print(f"   🤖 Model: {self.model}")
+            if self.model == "gpt-5-mini":
+                print("   ✅ Using latest GPT-5-mini model")
+            elif self.model == "gpt-4o-mini":
+                print("   ✅ Using GPT-4o-mini (GPT-5 not available yet)")
+            else:
+                print(f"   ⚠️  Model status: {self.model}")
             
             print("✅ ENVIRONMENT VALIDATION COMPLETED\n")
             return True
@@ -118,6 +173,7 @@ class SmallCapAnalysisSystem:
         print("   Institutional-Grade Investment Analysis System")
         print("=" * 80)
         print(f"Version: {self.version}")
+        print(f"Model: {self.model}")
         print(f"Session: {self.system_start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Mode: Professional Hedge Fund Analysis")
         print("=" * 80)
@@ -187,6 +243,7 @@ class SmallCapAnalysisSystem:
         
         summary = results.get('summary', {})
         
+        print(f"🤖 Model Used: {results.get('model', self.model)}")
         print(f"📊 Analysis Date: {summary.get('analysis_date', 'N/A')}")
         print(f"🆔 Execution ID: {summary.get('execution_id', 'N/A')}")
         print(f"⚡ Processing: {summary.get('agent_count', 4)} agents, {summary.get('task_count', 4)} tasks")
@@ -210,13 +267,14 @@ class SmallCapAnalysisSystem:
         print("❌ INSTITUTIONAL ANALYSIS FAILED")
         print("=" * 80)
         print(f"Error: {results.get('error', 'Unknown error')}")
+        print(f"Model: {results.get('model', self.model)}")
         print(f"Execution ID: {results.get('execution_id', 'N/A')}")
         print()
         print("🔧 TROUBLESHOOTING STEPS:")
-        print("   1. Check system logs for detailed error information")
-        print("   2. Verify database connectivity and data integrity")
-        print("   3. Validate input file format and content")
-        print("   4. Ensure all required dependencies are installed")
+        print("   1. Check your OpenAI API key is valid")
+        print("   2. Verify you have credits in your OpenAI account")
+        print("   3. Check system logs for detailed error information")
+        print("   4. Validate input file format and content")
         print("=" * 80)
 
 def main():
@@ -231,7 +289,7 @@ Examples:
   python main.py --input data/custom_stocks.csv    # Run with custom dataset
   python main.py --quiet                           # Run with minimal output
   
-For more information, visit: https://github.com/yourusername/small-cap-multi-agent-framework
+Powered by GPT-5-mini (or GPT-4o-mini fallback)
         """
     )
     
@@ -251,7 +309,7 @@ For more information, visit: https://github.com/yourusername/small-cap-multi-age
     parser.add_argument(
         '--version', '-v',
         action='version',
-        version='Small Cap Multi-Agent Framework v1.0.0'
+        version='Small Cap Multi-Agent Framework v2.0.0 (GPT-5-mini)'
     )
     
     args = parser.parse_args()

@@ -1,19 +1,8 @@
 """
-Hedge Fund Database System - Institutional Data Infrastructure
-============================================================
+Hedge Fund Database System with Real Market Data Integration
+===========================================================
 
-Simulates real hedge fund data infrastructure including:
-- Bloomberg Terminal equivalent data access
-- FactSet-style fundamental databases  
-- Alternative data aggregation platforms
-- Internal research database with analyst notes
-- Risk management data systems
-
-This mirrors how actual hedge funds structure their data access through
-multiple institutional data providers with normalized schemas.
-
-Author: Small Cap Multi-Agent Framework
-License: MIT
+Combines real-time market data from yfinance with local database fallback.
 """
 
 import sqlite3
@@ -25,172 +14,88 @@ import json
 import logging
 from pathlib import Path
 from crewai.tools import tool
+import yfinance as yf
 
-# Configure professional logging
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('hedge_fund_database.log'),
-        logging.StreamHandler()
-    ]
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
 class HedgeFundDatabaseSystem:
     """
-    Institutional-grade database system simulating real hedge fund data infrastructure.
-    
-    Replicates data access patterns from:
-    - Bloomberg Terminal
-    - FactSet Workstation  
-    - Refinitiv Eikon
-    - S&P Capital IQ
-    - Internal research databases
+    Hybrid database system combining real market data with local storage.
+    Primary: YFinance for real-time data
+    Fallback: SQLite for offline/testing
     """
     
     def __init__(self, db_path: str = "data/hedge_fund_database.db"):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(exist_ok=True)
         self._initialize_database()
-        self._populate_sample_data()
-        logger.info(f"Hedge Fund Database System initialized at {self.db_path}")
+        logger.info(f"Hedge Fund Database System initialized with YFinance integration")
     
     def _get_connection(self):
         """Get database connection."""
         return sqlite3.connect(self.db_path)
     
     def _initialize_database(self):
-        """Create institutional database schema mirroring real hedge fund systems."""
+        """Create minimal database schema for fallback."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             
-            # Securities Master Table (Bloomberg equivalent)
+            # Simplified schema for fallback
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS securities_master (
+                CREATE TABLE IF NOT EXISTS securities (
                     ticker TEXT PRIMARY KEY,
-                    company_name TEXT NOT NULL,
-                    gics_sector TEXT,
-                    gics_industry TEXT,
-                    exchange TEXT,
-                    country TEXT,
-                    currency TEXT,
-                    market_cap_usd REAL,
-                    shares_outstanding REAL,
-                    float_shares REAL,
-                    ipo_date DATE,
-                    fiscal_year_end TEXT,
-                    employees INTEGER,
-                    headquarters TEXT,
-                    website TEXT,
-                    business_description TEXT,
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    company_name TEXT,
+                    sector TEXT,
+                    market_cap REAL,
+                    exchange TEXT
                 )
             """)
             
-            # Fundamental Data (FactSet equivalent)
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS fundamental_data (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ticker TEXT NOT NULL,
-                    report_date DATE NOT NULL,
-                    period_type TEXT NOT NULL,
-                    fiscal_period TEXT NOT NULL,
-                    
-                    -- Income Statement
-                    total_revenue REAL,
-                    cost_of_revenue REAL,
-                    gross_profit REAL,
-                    operating_expenses REAL,
-                    operating_income REAL,
-                    ebitda REAL,
-                    interest_expense REAL,
-                    pretax_income REAL,
-                    tax_expense REAL,
-                    net_income REAL,
-                    eps_diluted REAL,
-                    shares_diluted REAL,
-                    
-                    -- Balance Sheet
-                    total_assets REAL,
-                    current_assets REAL,
-                    cash_and_equivalents REAL,
-                    accounts_receivable REAL,
-                    inventory REAL,
-                    total_liabilities REAL,
-                    current_liabilities REAL,
-                    long_term_debt REAL,
-                    shareholders_equity REAL,
-                    book_value_per_share REAL,
-                    tangible_book_value REAL,
-                    
-                    -- Cash Flow Statement
-                    operating_cash_flow REAL,
-                    capital_expenditures REAL,
-                    free_cash_flow REAL,
-                    financing_cash_flow REAL,
-                    investing_cash_flow REAL,
-                    
-                    -- Key Ratios
+                CREATE TABLE IF NOT EXISTS fundamentals (
+                    ticker TEXT PRIMARY KEY,
+                    pe_ratio REAL,
+                    pb_ratio REAL,
                     roe REAL,
-                    roa REAL,
-                    roic REAL,
-                    current_ratio REAL,
-                    quick_ratio REAL,
                     debt_to_equity REAL,
-                    interest_coverage REAL,
-                    
-                    data_source TEXT DEFAULT 'Internal',
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (ticker) REFERENCES securities_master (ticker),
-                    UNIQUE(ticker, report_date, period_type)
+                    current_ratio REAL,
+                    gross_margin REAL,
+                    operating_margin REAL,
+                    net_margin REAL,
+                    revenue_growth REAL,
+                    earnings_growth REAL,
+                    data_date DATE
                 )
             """)
             
-            # Market Data
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS market_data (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ticker TEXT NOT NULL,
-                    price_date DATE NOT NULL,
-                    open_price REAL,
-                    high_price REAL,
-                    low_price REAL,
-                    close_price REAL,
-                    adjusted_close REAL,
+                    ticker TEXT PRIMARY KEY,
+                    price REAL,
                     volume INTEGER,
-                    market_cap REAL,
-                    shares_outstanding REAL,
+                    day_change REAL,
+                    week_change REAL,
+                    month_change REAL,
+                    year_change REAL,
                     beta REAL,
-                    volatility_30d REAL,
-                    volatility_90d REAL,
-                    avg_volume_30d REAL,
-                    
-                    data_source TEXT DEFAULT 'Market Feed',
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (ticker) REFERENCES securities_master (ticker),
-                    UNIQUE(ticker, price_date)
+                    data_date DATE
                 )
             """)
             
-            # News and Sentiment
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS news_sentiment (
+                CREATE TABLE IF NOT EXISTS news (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ticker TEXT NOT NULL,
-                    news_date DATE NOT NULL,
-                    headline TEXT NOT NULL,
+                    ticker TEXT,
+                    headline TEXT,
+                    content TEXT,
                     source TEXT,
                     sentiment_score REAL,
-                    relevance_score REAL,
-                    article_url TEXT,
-                    article_summary TEXT,
-                    keywords TEXT,
-                    impact_category TEXT,
-                    
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (ticker) REFERENCES securities_master (ticker)
+                    publish_date DATE
                 )
             """)
             
@@ -198,108 +103,29 @@ class HedgeFundDatabaseSystem:
             logger.info("Database schema created successfully")
     
     def _populate_sample_data(self):
-        """Populate database with realistic institutional-quality sample data."""
+        """Add sample data if database is empty."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM securities_master")
-            if cursor.fetchone()[0] > 0:
-                logger.info("Sample data already exists, skipping population")
-                return
-            
-            # Insert sample securities
-            securities_data = [
-                ('SMLR', 'Semler Scientific Inc', 'Health Care', 'Health Care Technology', 'NASDAQ', 'US', 'USD', 
-                 295000000, 6920000, 5450000, '2014-02-12', 'December', 85, 'Santa Clara, CA', 
-                 'https://semlerscientific.com', 'Develops and markets diagnostic technology solutions for cardiovascular disease detection'),
-                
-                ('HROW', 'Harrow Health Inc', 'Health Care', 'Pharmaceuticals', 'NASDAQ', 'US', 'USD',
-                 148000000, 12500000, 11200000, '2017-08-09', 'December', 245, 'Nashville, TN',
-                 'https://harrowhealth.com', 'Specialty pharmaceutical company focused on ophthalmic medications'),
-                
-                ('AGFY', 'Agrify Corporation', 'Information Technology', 'Technology Hardware & Equipment', 'NASDAQ', 'US', 'USD',
-                 38500000, 6000000, 5100000, '2021-01-26', 'December', 125, 'Troy, MI',
-                 'https://agrify.com', 'Provides cultivation and extraction solutions for cannabis and food industries'),
-                
-                ('VERX', 'Vertex Inc', 'Information Technology', 'Software', 'NASDAQ', 'US', 'USD',
-                 1650000000, 48200000, 42800000, '2020-07-30', 'December', 1850, 'King of Prussia, PA',
-                 'https://vertexinc.com', 'Provides tax technology solutions for corporations worldwide')
-            ]
-            
-            cursor.executemany("""
-                INSERT INTO securities_master 
-                (ticker, company_name, gics_sector, gics_industry, exchange, country, currency,
-                 market_cap_usd, shares_outstanding, float_shares, ipo_date, fiscal_year_end,
-                 employees, headquarters, website, business_description)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, securities_data)
-            
-            # Insert sample fundamental data
-            fundamental_sample = [
-                ('SMLR', '2024-09-30', 'Q', 'Q3', 72500000, 13000000, 59500000, 41000000, 18500000, 
-                 22000000, 800000, 17700000, 2600000, 15100000, 2.18, 6920000, 
-                 95000000, 68000000, 42000000, 8500000, 2100000, 35000000, 15000000, 1200000, 60000000, 8.67, 59000000,
-                 18500000, 2800000, 15700000, -2100000, -3500000,
-                 0.19, 0.14, 0.22, 4.8, 4.2, 0.03, 85.0),
-            ]
-            
-            for data in fundamental_sample:
-                cursor.execute("""
-                    INSERT INTO fundamental_data 
-                    (ticker, report_date, period_type, fiscal_period, total_revenue, cost_of_revenue,
-                     gross_profit, operating_expenses, operating_income, ebitda, interest_expense,
-                     pretax_income, tax_expense, net_income, eps_diluted, shares_diluted,
-                     total_assets, current_assets, cash_and_equivalents, accounts_receivable, inventory,
-                     total_liabilities, current_liabilities, long_term_debt, shareholders_equity,
-                     book_value_per_share, tangible_book_value, operating_cash_flow, capital_expenditures,
-                     free_cash_flow, financing_cash_flow, investing_cash_flow, roe, roa, roic,
-                     current_ratio, quick_ratio, debt_to_equity, interest_coverage)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, data)
-            
-            # Insert sample news data
-            news_sample = [
-                ('SMLR', '2024-10-20', 'Semler Scientific Reports Strong Q3 Results',
-                 'MarketWatch', 0.72, 0.95, 'https://example.com/smlr-earnings',
-                 'Company beats revenue estimates with 28% growth', '["earnings", "growth", "beat"]', 'Earnings'),
-            ]
-            
-            cursor.executemany("""
-                INSERT INTO news_sentiment 
-                (ticker, news_date, headline, source, sentiment_score, relevance_score,
-                 article_url, article_summary, keywords, impact_category)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, news_sample)
-            
-            conn.commit()
-            logger.info("Sample data populated successfully")
-
-# Database Query Engine
-class DatabaseQueryEngine:
-    """Professional database query engine for hedge fund data access."""
-    
-    def __init__(self, db_system: HedgeFundDatabaseSystem):
-        self.db_system = db_system
-        self.db_path = db_system.db_path
-    
-    def execute_query(self, query: str, params: tuple = ()) -> pd.DataFrame:
-        """Execute SQL query and return results as DataFrame."""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                df = pd.read_sql_query(query, conn, params=params)
-                logger.info(f"Query executed successfully, returned {len(df)} rows")
-                return df
-        except Exception as e:
-            logger.error(f"Query execution failed: {str(e)}")
-            raise
+            cursor.execute("SELECT COUNT(*) FROM securities")
+            if cursor.fetchone()[0] == 0:
+                # Add a few sample records
+                sample_data = [
+                    ('AAPL', 'Apple Inc', 'Technology', 3000000000000, 'NASDAQ'),
+                    ('MSFT', 'Microsoft Corp', 'Technology', 2800000000000, 'NASDAQ'),
+                ]
+                cursor.executemany(
+                    "INSERT OR IGNORE INTO securities VALUES (?, ?, ?, ?, ?)",
+                    sample_data
+                )
+                conn.commit()
 
 # Initialize global database system
 hedge_fund_db = HedgeFundDatabaseSystem()
-query_engine = DatabaseQueryEngine(hedge_fund_db)
 
 @tool
 def query_institutional_database(ticker: str, query_type: str = "fundamental") -> str:
     """
-    Access institutional-grade financial database (Bloomberg/FactSet equivalent).
+    Access institutional-grade financial database with real-time data.
     
     Available query types:
     - fundamental: Complete financial metrics and ratios
@@ -307,101 +133,236 @@ def query_institutional_database(ticker: str, query_type: str = "fundamental") -
     - news: Recent news and sentiment analysis
     """
     try:
-        ticker = ticker.upper()
+        ticker = ticker.upper().strip()
+        logger.info(f"Querying {query_type} data for {ticker}")
         
-        if query_type == "fundamental":
-            return _get_fundamental_analysis(ticker)
-        elif query_type == "news":
-            return _get_news_analysis(ticker)
-        else:
-            return f"Query type '{query_type}' not yet implemented"
+        # ALWAYS try YFinance first for real data
+        try:
+            stock = yf.Ticker(ticker)
+            
+            if query_type == "fundamental":
+                return _get_yfinance_fundamentals(stock, ticker)
+            elif query_type == "news":
+                return _get_yfinance_news(stock, ticker)
+            elif query_type == "market":
+                return _get_yfinance_market(stock, ticker)
+            else:
+                return f"Unknown query type: {query_type}"
+                
+        except Exception as yf_error:
+            logger.warning(f"YFinance failed for {ticker}: {yf_error}")
+            # Fallback to local database
+            return _get_local_data(ticker, query_type)
             
     except Exception as e:
         logger.error(f"Database query failed for {ticker}: {str(e)}")
-        return f"Database query failed: {str(e)}"
+        return f"Error fetching data for {ticker}: {str(e)}"
 
-def _get_fundamental_analysis(ticker: str) -> str:
-    """Get comprehensive fundamental analysis from institutional database."""
-    
-    # Get security profile
-    query = "SELECT * FROM securities_master WHERE ticker = ? COLLATE NOCASE"
-    security_df = query_engine.execute_query(query, (ticker,))
-    
-    if security_df.empty:
-        return f"Security {ticker} not found in institutional database"
-    
-    security = security_df.iloc[0]
-    
-    # Get latest fundamentals
-    query = """
-        SELECT * FROM fundamental_data 
-        WHERE ticker = ? COLLATE NOCASE
-        ORDER BY report_date DESC
-        LIMIT 1
-    """
-    fund_df = query_engine.execute_query(query, (ticker,))
-    
-    if fund_df.empty:
-        return f"No fundamental data available for {ticker}"
-    
-    fund = fund_df.iloc[0]
-    
-    return f"""
+def _get_yfinance_fundamentals(stock, ticker: str) -> str:
+    """Get fundamental data from YFinance."""
+    try:
+        info = stock.info
+        
+        # Check if we got valid data
+        if not info or 'symbol' not in info:
+            return f"No fundamental data available for {ticker}"
+        
+        # Extract key metrics with defaults
+        company_name = info.get('longName', ticker)
+        sector = info.get('sector', 'Unknown')
+        market_cap = info.get('marketCap', 0)
+        
+        # Valuation metrics
+        pe_ratio = info.get('trailingPE', 0)
+        forward_pe = info.get('forwardPE', 0)
+        pb_ratio = info.get('priceToBook', 0)
+        ps_ratio = info.get('priceToSalesTrailing12Months', 0)
+        peg_ratio = info.get('pegRatio', 0)
+        
+        # Profitability metrics
+        profit_margins = info.get('profitMargins', 0)
+        gross_margins = info.get('grossMargins', 0)
+        operating_margins = info.get('operatingMargins', 0)
+        roe = info.get('returnOnEquity', 0)
+        roa = info.get('returnOnAssets', 0)
+        
+        # Growth metrics
+        revenue_growth = info.get('revenueGrowth', 0)
+        earnings_growth = info.get('earningsGrowth', 0)
+        
+        # Financial health
+        current_ratio = info.get('currentRatio', 0)
+        debt_to_equity = info.get('debtToEquity', 0)
+        total_cash = info.get('totalCash', 0)
+        total_debt = info.get('totalDebt', 0)
+        free_cash_flow = info.get('freeCashflow', 0)
+        
+        # Price info
+        current_price = info.get('currentPrice', info.get('regularMarketPrice', 0))
+        target_price = info.get('targetMeanPrice', 0)
+        
+        return f"""
 ═══════════════════════════════════════════════════════════════
-INSTITUTIONAL DATABASE: FUNDAMENTAL ANALYSIS - {ticker}
-Data Source: Hedge Fund Database System | Last Updated: {fund['created_date']}
+FUNDAMENTAL ANALYSIS - {ticker} (REAL-TIME DATA)
+Data Source: Yahoo Finance | {datetime.now().strftime('%Y-%m-%d %H:%M')}
 ═══════════════════════════════════════════════════════════════
 
 COMPANY PROFILE:
-Company: {security['company_name']}
-GICS Sector: {security['gics_sector']} | Industry: {security['gics_industry']}
-Exchange: {security['exchange']} | Country: {security['country']}
-Market Cap: ${security['market_cap_usd']/1e6:.1f}M
+Company: {company_name}
+Sector: {sector}
+Market Cap: ${market_cap:,.0f}
 
-FINANCIAL METRICS (As of {fund['report_date']}):
-Revenue (TTM): ${fund['total_revenue']/1e6:.1f}M
-Gross Margin: {(fund['gross_profit']/fund['total_revenue']*100):.1f}%
-Operating Margin: {(fund['operating_income']/fund['total_revenue']*100):.1f}%
-Net Margin: {(fund['net_income']/fund['total_revenue']*100):.1f}%
-ROE: {fund['roe']*100:.1f}%
-Current Ratio: {fund['current_ratio']:.1f}x
-Debt/Equity: {fund['debt_to_equity']:.2f}x
+VALUATION METRICS:
+P/E Ratio (TTM): {pe_ratio:.2f}
+Forward P/E: {forward_pe:.2f}
+P/B Ratio: {pb_ratio:.2f}
+P/S Ratio: {ps_ratio:.2f}
+PEG Ratio: {peg_ratio:.2f}
 
-DATABASE INTEGRITY: ✓ Verified | Source: Institutional Database
+PROFITABILITY:
+Gross Margins: {gross_margins*100:.1f}%
+Operating Margins: {operating_margins*100:.1f}%
+Net Margins: {profit_margins*100:.1f}%
+ROE: {roe*100:.1f}%
+ROA: {roa*100:.1f}%
+
+GROWTH:
+Revenue Growth: {revenue_growth*100:.1f}%
+Earnings Growth: {earnings_growth*100:.1f}%
+
+FINANCIAL HEALTH:
+Current Ratio: {current_ratio:.2f}
+Debt/Equity: {debt_to_equity:.2f}
+Total Cash: ${total_cash:,.0f}
+Total Debt: ${total_debt:,.0f}
+Free Cash Flow: ${free_cash_flow:,.0f}
+
+PRICE TARGETS:
+Current Price: ${current_price:.2f}
+Analyst Target: ${target_price:.2f}
+Upside Potential: {((target_price/current_price - 1)*100 if current_price > 0 else 0):.1f}%
 """
+    except Exception as e:
+        logger.error(f"Error processing fundamentals for {ticker}: {e}")
+        return f"Limited fundamental data available for {ticker}"
 
-def _get_news_analysis(ticker: str) -> str:
-    """Get news and sentiment analysis from institutional database."""
-    
-    query = """
-        SELECT news_date, headline, source, sentiment_score, article_summary
-        FROM news_sentiment 
-        WHERE ticker = ? COLLATE NOCASE
-        ORDER BY news_date DESC
-        LIMIT 5
-    """
-    
-    news_df = query_engine.execute_query(query, (ticker,))
-    
-    if news_df.empty:
-        return f"No recent news available for {ticker}"
-    
-    news_list = ""
-    for _, news in news_df.iterrows():
-        sentiment_icon = "📈" if news['sentiment_score'] > 0.2 else "📉" if news['sentiment_score'] < -0.2 else "➡️"
-        news_list += f"""
-{sentiment_icon} [{news['news_date']}] {news['headline']}
-   Source: {news['source']} | Sentiment: {news['sentiment_score']:+.2f}
-   Summary: {news['article_summary']}"""
-    
-    return f"""
+def _get_yfinance_news(stock, ticker: str) -> str:
+    """Get news data from YFinance."""
+    try:
+        news = stock.news
+        
+        if not news:
+            return f"No recent news available for {ticker}"
+        
+        news_output = f"""
 ═══════════════════════════════════════════════════════════════
-INSTITUTIONAL DATABASE: NEWS & SENTIMENT ANALYSIS - {ticker}
-Data Source: Alternative Data Platform | Recent Coverage
+NEWS & SENTIMENT - {ticker} (REAL-TIME)
+Data Source: Yahoo Finance | {datetime.now().strftime('%Y-%m-%d %H:%M')}
 ═══════════════════════════════════════════════════════════════
 
 RECENT NEWS:
-{news_list}
-
-DATABASE INTEGRITY: ✓ Verified | Source: News Database
 """
+        
+        for i, item in enumerate(news[:5], 1):
+            title = item.get('title', 'No title')
+            publisher = item.get('publisher', 'Unknown')
+            link = item.get('link', '')
+            
+            # Simple sentiment based on keywords
+            sentiment = "Neutral"
+            positive_words = ['beat', 'exceed', 'upgrade', 'growth', 'profit', 'gain']
+            negative_words = ['miss', 'downgrade', 'loss', 'decline', 'cut', 'weak']
+            
+            title_lower = title.lower()
+            if any(word in title_lower for word in positive_words):
+                sentiment = "Positive 📈"
+            elif any(word in title_lower for word in negative_words):
+                sentiment = "Negative 📉"
+            
+            news_output += f"""
+{i}. {title}
+   Publisher: {publisher}
+   Sentiment: {sentiment}
+   Link: {link[:50]}...
+"""
+        
+        return news_output
+        
+    except Exception as e:
+        logger.error(f"Error getting news for {ticker}: {e}")
+        return f"No recent news available for {ticker}"
+
+def _get_yfinance_market(stock, ticker: str) -> str:
+    """Get market data from YFinance."""
+    try:
+        info = stock.info
+        history = stock.history(period="1mo")
+        
+        if history.empty:
+            return f"No market data available for {ticker}"
+        
+        current_price = history['Close'].iloc[-1]
+        volume = history['Volume'].iloc[-1]
+        
+        # Calculate changes
+        week_ago = history['Close'].iloc[-5] if len(history) >= 5 else history['Close'].iloc[0]
+        month_ago = history['Close'].iloc[0]
+        
+        week_change = ((current_price - week_ago) / week_ago * 100) if week_ago > 0 else 0
+        month_change = ((current_price - month_ago) / month_ago * 100) if month_ago > 0 else 0
+        
+        # Get additional info
+        beta = info.get('beta', 0)
+        avg_volume = info.get('averageVolume', 0)
+        fifty_two_high = info.get('fiftyTwoWeekHigh', 0)
+        fifty_two_low = info.get('fiftyTwoWeekLow', 0)
+        
+        return f"""
+═══════════════════════════════════════════════════════════════
+MARKET DATA - {ticker} (REAL-TIME)
+Data Source: Yahoo Finance | {datetime.now().strftime('%Y-%m-%d %H:%M')}
+═══════════════════════════════════════════════════════════════
+
+PRICE INFORMATION:
+Current Price: ${current_price:.2f}
+Week Change: {week_change:.2f}%
+Month Change: {month_change:.2f}%
+52-Week High: ${fifty_two_high:.2f}
+52-Week Low: ${fifty_two_low:.2f}
+
+VOLUME:
+Today's Volume: {volume:,.0f}
+Average Volume: {avg_volume:,.0f}
+Volume vs Avg: {(volume/avg_volume*100 if avg_volume > 0 else 0):.0f}%
+
+RISK METRICS:
+Beta: {beta:.2f}
+Volatility: {history['Close'].pct_change().std() * 100:.1f}% (30-day)
+"""
+        
+    except Exception as e:
+        logger.error(f"Error getting market data for {ticker}: {e}")
+        return f"Limited market data available for {ticker}"
+
+def _get_local_data(ticker: str, query_type: str) -> str:
+    """Fallback to local database if YFinance fails."""
+    try:
+        conn = hedge_fund_db._get_connection()
+        cursor = conn.cursor()
+        
+        if query_type == "fundamental":
+            cursor.execute("SELECT * FROM fundamentals WHERE ticker = ?", (ticker,))
+            result = cursor.fetchone()
+            if result:
+                return f"Fallback data for {ticker}: Limited fundamental data available"
+        
+        return f"No local data available for {ticker}"
+        
+    except Exception as e:
+        logger.error(f"Local database query failed: {e}")
+        return f"No data available for {ticker}"
+    finally:
+        conn.close()
+
+# Create tool instance for export
+query_institutional_database_tool = query_institutional_database

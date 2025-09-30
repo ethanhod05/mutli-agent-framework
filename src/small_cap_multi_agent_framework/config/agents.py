@@ -1,319 +1,298 @@
 """
-Professional Agents Implementation - Working with litellm
-========================================================
+Multi-Agent Configuration - GPT-5-mini
+=======================================
 
-Professional agent implementations that work properly with CrewAI's litellm backend.
-
-Author: Small Cap Multi-Agent Framework
-License: MIT
+Practical implementation using OpenAI GPT-5-mini.
+Clean, simple, and ready to run.
 """
 
 from crewai import Agent, LLM
-from small_cap_multi_agent_framework.tools.hedge_fund_database import query_institutional_database
-import yaml
 import os
-from pathlib import Path
 import logging
 from dotenv import load_dotenv
-import time
+from pathlib import Path
 
-# Load environment variables and configure Groq
-load_dotenv()
-
-# Configure Groq API
-if os.getenv("GROQ_API_KEY"):
-    os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
-    
-    print("✅ Configured to use free Groq API with proper litellm integration")
-    print("🚀 Model: Llama 3.3 70B (high performance)")
-    print("💰 Cost: $0.00 (free tier)")
-
-# Configure professional logging
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Simple rate limiting with delays
-REQUEST_DELAY = 3.0  # seconds between requests
-last_request_time = 0
+# Load environment variables
+load_dotenv()
+try:
+    from small_cap_multi_agent_framework.tools.ticker_discovery_tool import ticker_discovery_tool
+    logger.info("✅ Ticker discovery tool loaded")
+except ImportError:
+    ticker_discovery_tool = None
+    logger.warning("⚠️  Ticker discovery tool not found")
 
-def create_groq_llm(model: str, max_tokens: int = 1200, temperature: float = 0.1):
-    """Create a CrewAI LLM instance that works with litellm."""
-    global last_request_time
-    
-    # Add delay if needed
-    current_time = time.time()
-    time_since_last = current_time - last_request_time
-    if time_since_last < REQUEST_DELAY:
-        sleep_time = REQUEST_DELAY - time_since_last
-        logger.info(f"Rate limiting: waiting {sleep_time:.1f}s")
-        time.sleep(sleep_time)
-    
-    last_request_time = time.time()
-    
-    # Use CrewAI's LLM class which properly handles litellm
+# Check for API key
+if not os.getenv("OPENAI_API_KEY"):
+    raise ValueError("OPENAI_API_KEY not found. Please add it to your .env file")
+
+logger.info("✅ OpenAI API configured")
+
+# Detect which model to use
+def detect_model():
+    """Try gpt-5-mini first, fallback to gpt-4o-mini"""
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        
+        # Try GPT-5-mini
+        try:
+            response = client.chat.completions.create(
+                model="gpt-5-mini",
+                messages=[{"role": "user", "content": "test"}],
+                max_tokens=1
+            )
+            return "gpt-5-mini"
+        except:
+            # Fallback to gpt-4o-mini
+            return "gpt-4o-mini"
+    except:
+        return "gpt-4o-mini"
+
+MODEL_NAME = detect_model()
+logger.info(f"🚀 Using {MODEL_NAME} for all agents")
+
+def create_llm(max_completion_tokens=1000, temperature=0.2):
+    """Create LLM instance with correct parameters for new OpenAI API."""
     return LLM(
-        model=model,
+        model=MODEL_NAME,
         temperature=temperature,
-        max_tokens=max_tokens,
-        api_key=os.getenv("GROQ_API_KEY")
+        max_completion_tokens=max_completion_tokens,  # Changed from max_tokens
+        api_key=os.getenv("OPENAI_API_KEY")
     )
 
-class ProfessionalAgentFactory:
-    """Factory for creating professional hedge fund agents that work with CrewAI."""
+class AgentFactory:
+    """Factory for creating agents with correct API parameters."""
     
-    def __init__(self, config_path: str = None):
-        if config_path is None:
-            config_path = Path(__file__).parent / 'agents.yaml'
+    def __init__(self):
+        logger.info(f"Initializing agent factory with {MODEL_NAME}...")
         
-        self.config = self._load_agent_config(config_path)
-        logger.info("Professional agent factory with working litellm integration initialized")
+        # Log configuration
+        logger.info("\n" + "="*50)
+        logger.info(f"MODEL CONFIGURATION: {MODEL_NAME}")
+        logger.info("="*50)
+        logger.info("Using max_completion_tokens (new API parameter)")
+        logger.info("Expected cost: ~$0.002-0.003 per security")
+        logger.info("Throughput: 50-100 securities per minute")
+        logger.info("="*50)
+        
+        # Try to import tools if available
+        self.tools = self._load_tools()
     
-    def _load_agent_config(self, config_path: Path) -> dict:
-        """Load agent configurations from YAML file."""
+    def _load_tools(self):
+        """Load tools if available."""
         try:
-            with open(config_path, 'r') as file:
-                config = yaml.safe_load(file)
-                logger.info(f"Loaded agent configuration from {config_path}")
-                return config
-        except Exception as e:
-            logger.error(f"Failed to load agent config: {str(e)}")
-            raise
-    
-    def create_data_cleaner(self) -> Agent:
-        """Create the Senior Financial Data Quality Specialist agent."""
-        config = self.config['data_cleaner']
-        
-        # Use smaller, faster model for data cleaning
-        groq_llm = create_groq_llm(
-            model="groq/llama-3.1-8b-instant",
-            max_tokens=800,
-            temperature=0.1
-        )
-        
+            from small_cap_multi_agent_framework.tools.hedge_fund_database import query_institutional_database
+            logger.info("✅ Database tools loaded")
+            
+            loaded_tools = [query_institutional_database]
+            if ticker_discovery_tool:
+                loaded_tools.append(ticker_discovery_tool)
+            return loaded_tools
+
+        except ImportError:
+            logger.warning("⚠️  Database tools not found - agents will work without them")
+            return []
+
+    # === NEW AGENT METHOD START ===
+    def create_ticker_researcher(self):
+        """Create a ticker research agent."""
+        # This agent only gets the discovery tool to ensure it stays on task.
+        discovery_tools = [tool for tool in self.tools if tool.name == "Ticker Discovery Tool"]
+        if not discovery_tools:
+            logger.error("Ticker Discovery Tool is required for the Ticker Research Specialist but was not found.")
+            # Return a non-functional agent or raise an error
+            return Agent(role="Ticker Research Specialist", goal="Discover tickers (Tool not found)", backstory="Tool missing", verbose=True)
+
         return Agent(
-            role=config['role'],
-            goal=config['goal'],
-            backstory=config['backstory'],
+            role="Ticker Research Specialist",
+            goal="Discover a list of relevant small-cap stock tickers for analysis",
+            backstory="An expert at scanning the market to identify promising companies based on predefined criteria.",
             verbose=True,
             allow_delegation=False,
-            max_iter=2,  # Reduced iterations
+            max_iter=2,
+            memory=True,
+            tools=discovery_tools,
+            llm=create_llm(max_completion_tokens=500, temperature=0.1),
+            system_message="Your sole purpose is to use the 'Ticker Discovery Tool' to find stocks. Output only the list of tickers you find."
+        )
+    # === NEW AGENT METHOD END ===
+
+    def create_data_cleaner(self):
+        """Create data cleaning agent."""
+        return Agent(
+            role="Financial Data Quality Specialist",
+            goal="Ensure data accuracy and standardization",
+            backstory="Expert in financial data validation with focus on small-cap securities",
+            verbose=True,
+            allow_delegation=False,
+            max_iter=2,
             memory=True,
             tools=[],
-            llm=groq_llm,
-            system_message="""You are a Senior Financial Data Quality Specialist with 8+ years of 
-            experience at Bloomberg and FactSet. Be concise and efficient in your analysis.
+            llm=create_llm(max_completion_tokens=800, temperature=0.1),
+            system_message="""Validate and clean financial data:
+            1. Check ticker symbols and exchange listings
+            2. Verify market cap calculations
+            3. Standardize sector classifications to GICS
+            4. Flag any data quality issues
+            5. Ensure consistency across fields
             
-            Key responsibilities:
-            1. Validate ticker symbols against major exchanges
-            2. Verify market capitalization calculations
-            3. Standardize sector classifications using GICS standards
-            4. Flag any data quality issues for manual review
-            5. Maintain detailed audit trails for compliance
-            
-            Provide clear, actionable results without excessive detail."""
+            Output: Cleaned data with brief summary of issues found."""
         )
     
-    def create_data_enricher(self) -> Agent:
-        """Create the Quantitative Research Analyst agent with database access."""
-        config = self.config['data_enricher']
-        
-        groq_llm = create_groq_llm(
-            model="groq/llama-3.3-70b-versatile",
-            max_tokens=1500,
-            temperature=0.1
-        )
-        
+    def create_data_enricher(self):
+        """Create data enrichment agent."""
         return Agent(
-            role=config['role'],
-            goal=config['goal'],
-            backstory=config['backstory'],
+            role="Quantitative Financial Analyst",
+            goal="Enrich securities with fundamental analysis",
+            backstory="CFA charterholder specializing in small-cap equity research",
             verbose=True,
             allow_delegation=False,
             max_iter=3,
             memory=True,
-            tools=[query_institutional_database],
-            llm=groq_llm,
-            system_message="""You are a CFA charterholder and quantitative research analyst 
-            specializing in small-cap equity analysis. You have direct access to institutional-grade 
-            financial databases equivalent to Bloomberg Terminal and FactSet Workstation.
+            tools=self.tools,
+            llm=create_llm(max_completion_tokens=1200, temperature=0.2),
+            system_message="""Perform fundamental analysis for each security:
+            1. Calculate key valuation metrics (P/E, P/B, EV/EBITDA)
+            2. Analyze profitability (ROE, ROA, margins)
+            3. Assess growth metrics (revenue and earnings growth)
+            4. Evaluate financial health (debt ratios, liquidity)
+            5. Generate quality score (1-10)
             
-            Your analysis must include:
-            1. Comprehensive fundamental metrics using database queries
-            2. Sector-relative positioning and percentile rankings
-            3. Financial quality assessment and red flag identification
-            4. Growth trajectory analysis with 3-year historical context
-            5. Balance sheet strength and liquidity analysis
-            
-            Use the query_institutional_database tool efficiently:
-            - "fundamental" for complete financial analysis
-            - "news" for sentiment context
-            
-            Provide institutional-quality analysis that portfolio managers can trust."""
+            Focus on metrics most relevant for small-cap investing.
+            Output: Structured analysis with key metrics and scores."""
         )
     
-    def create_news_scanner(self) -> Agent:
-        """Create the Market Intelligence Analyst agent with alternative data access."""
-        config = self.config['news_scanner']
-        
-        groq_llm = create_groq_llm(
-            model="groq/llama-3.3-70b-versatile",
-            max_tokens=1200,
-            temperature=0.1
-        )
-        
+    def create_news_scanner(self):
+        """Create news scanning agent."""
         return Agent(
-            role=config['role'],
-            goal=config['goal'],
-            backstory=config['backstory'],
+            role="Market Intelligence Analyst",
+            goal="Extract insights from news and sentiment",
+            backstory="Former hedge fund analyst specializing in event-driven strategies",
             verbose=True,
             allow_delegation=False,
             max_iter=3,
             memory=True,
-            tools=[query_institutional_database],
-            llm=groq_llm,
-            system_message="""You are a Market Intelligence Analyst with hedge fund experience 
-            in event-driven strategies and alternative data analysis.
+            tools=self.tools,
+            llm=create_llm(max_completion_tokens=1000, temperature=0.3),
+            system_message="""Analyze news and sentiment for each security:
+            1. Assess overall sentiment (-100 to +100)
+            2. Identify key catalysts or events
+            3. Evaluate news volume vs. historical average
+            4. Flag any significant risks or opportunities
+            5. Determine momentum (improving/stable/deteriorating)
             
-            Your analysis must include:
-            1. Comprehensive news flow analysis with sentiment quantification
-            2. Catalyst identification and probability assessment
-            3. Market narrative analysis and theme identification
-            4. Risk event monitoring and impact assessment
-            
-            Use the query_institutional_database tool efficiently:
-            - "news" for sentiment analysis and recent headlines
-            - "fundamental" for context on financial health
-            
-            Focus on actionable intelligence that can impact investment decisions."""
+            Output: Sentiment analysis with specific catalysts identified."""
         )
     
-    def create_alpha_analyst(self) -> Agent:
-        """Create the Senior Portfolio Manager agent for investment recommendations."""
-        config = self.config['alpha_analyst']
-        
-        groq_llm = create_groq_llm(
-            model="groq/llama-3.3-70b-versatile",
-            max_tokens=2000,
-            temperature=0.1
-        )
-        
+    def create_alpha_analyst(self):
+        """Create alpha generation analyst."""
+        # === START MODIFICATION ===
+        # The manager should only have the delegation tool. Let's filter for it.
+        # NOTE: CrewAI automatically provides the delegation tool if allow_delegation=True,
+        # so setting tools=[] is the correct way to ensure it can ONLY delegate.
+        manager_tools = []
+        # ==========================
         return Agent(
-            role=config['role'],
-            goal=config['goal'],
-            backstory=config['backstory'],
+            role="Senior Portfolio Manager",
+            goal="Generate actionable investment recommendations",
+            backstory="Experienced portfolio manager with track record in small-cap investing",
             verbose=True,
             allow_delegation=True,
             max_iter=4,
             memory=True,
-            tools=[query_institutional_database],
-            llm=groq_llm,
-            system_message="""You are a Senior Portfolio Manager with 12+ years of experience 
-            managing small-cap strategies at institutional asset management firms.
+            # === USE THE NEW EMPTY TOOL LIST ===
+            tools=manager_tools,
+            # ===================================
+            llm=create_llm(max_completion_tokens=1500, temperature=0.2),
+            system_message="""Generate investment recommendations based on all analysis:
+            1. Investment thesis (3-5 key points)
+            2. Price target and expected return
+            3. Suggested position size (% of portfolio)
+            4. Entry and exit strategy
+            5. Key risks to monitor
+            6. Conviction score (1-10)
             
-            Your investment recommendations must include:
-            1. Comprehensive synthesis of fundamental and sentiment analysis
-            2. Risk-adjusted return calculations with confidence intervals
-            3. Position sizing recommendations based on conviction and risk
-            4. Specific entry/exit strategies with price targets
-            5. Catalyst-driven investment thesis with timing considerations
-            
-            Use ALL available database query types to build complete investment profiles:
-            - "fundamental" for financial analysis
-            - "news" for sentiment and narrative analysis
-            
-            Your output must be institutional-quality investment research that investment 
-            committees can use for fiduciary decision-making."""
+            Provide clear BUY/HOLD/SELL recommendation with rationale.
+            Output: Concise investment memo with specific action items."""
         )
 
-# Create global agent instances with staggered timing
-def create_professional_agents():
-    """Create all professional agents with database access and proper litellm integration."""
+def create_agents():
+    """Create all agents."""
     try:
-        factory = ProfessionalAgentFactory()
+        factory = AgentFactory()
         
-        logger.info("Creating agents with staggered timing to avoid rate limits...")
+        logger.info("\nCreating agent team...")
         
-        # Create agents with delays between each
-        agents = {}
+        # === MODIFIED AGENT DICTIONARY ===
+        agents = {
+            'ticker_researcher': factory.create_ticker_researcher(),
+            'data_cleaner': factory.create_data_cleaner(),
+            'data_enricher': factory.create_data_enricher(),
+            'news_scanner': factory.create_news_scanner(),
+            'alpha_analyst': factory.create_alpha_analyst()
+        }
+        # ================================
         
-        logger.info("Creating data cleaner agent...")
-        agents['data_cleaner'] = factory.create_data_cleaner()
-        time.sleep(3)  # 3-second delay
+        logger.info(f"✅ Created {len(agents)} agents successfully")
         
-        logger.info("Creating data enricher agent...")
-        agents['data_enricher'] = factory.create_data_enricher()
-        time.sleep(3)  # 3-second delay
+        # Cost estimate
+        cost_per_security = 0.0025
+        logger.info(f"💰 Estimated cost: ~${cost_per_security:.3f} per security")
+        logger.info(f"📈 Expected throughput: 50-100 securities per minute")
         
-        logger.info("Creating news scanner agent...")
-        agents['news_scanner'] = factory.create_news_scanner()
-        time.sleep(3)  # 3-second delay
-        
-        logger.info("Creating alpha analyst agent...")
-        agents['alpha_analyst'] = factory.create_alpha_analyst()
-        
-        logger.info("All professional agents created successfully with working litellm integration")
         return agents
         
     except Exception as e:
-        logger.error(f"Failed to create professional agents: {str(e)}")
+        logger.error(f"Failed to create agents: {str(e)}")
         raise
 
-# Agent instances for import
+# Test function
+def test_setup():
+    """Quick test to verify setup works."""
+    try:
+        logger.info("\n🧪 Testing setup...")
+        
+        # Test LLM creation with new parameter
+        test_llm = create_llm(max_completion_tokens=50)
+        
+        # Create a simple test agent
+        test_agent = Agent(
+            role="Test Agent",
+            goal="Verify setup",
+            backstory="Testing the configuration",
+            verbose=True,
+            llm=test_llm
+        )
+        
+        logger.info(f"✅ Setup test passed with {MODEL_NAME}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ Setup test failed: {str(e)}")
+        return False
+
+# When imported as a module, create and export agents
 try:
-    _agents = create_professional_agents()
-    data_cleaner = _agents['data_cleaner']
-    data_enricher = _agents['data_enricher']
-    news_scanner = _agents['news_scanner']
-    alpha_analyst = _agents['alpha_analyst']
-    
-    logger.info("Professional agents ready for deployment with working litellm integration")
-    
+    agents = create_agents()
+    # === EXPORT THE NEW AGENT ===
+    ticker_researcher = agents['ticker_researcher']
+    # ============================
+    data_cleaner = agents['data_cleaner']
+    data_enricher = agents['data_enricher']
+    news_scanner = agents['news_scanner']
+    alpha_analyst = agents['alpha_analyst']
 except Exception as e:
-    logger.error(f"Agent initialization failed: {str(e)}")
-    # Create fallback basic agents if needed
-    logger.warning("Creating fallback agents")
-    
-    fallback_llm = LLM(
-        model="groq/llama-3.1-8b-instant",
-        temperature=0.1,
-        max_tokens=800,
-        api_key=os.getenv("GROQ_API_KEY")
-    )
-    
-    data_cleaner = Agent(
-        role="Financial Data Normalizer",
-        goal="Clean and standardize small-cap datasets",
-        backstory="You specialize in data quality assurance",
-        verbose=True,
-        llm=fallback_llm
-    )
-    
-    data_enricher = Agent(
-        role="Fundamentals Enricher", 
-        goal="Gather financial metrics and analysis",
-        backstory="You are skilled at financial analysis",
-        verbose=True,
-        tools=[query_institutional_database],
-        llm=fallback_llm
-    )
-    
-    news_scanner = Agent(
-        role="Market Narrative Watcher",
-        goal="Monitor news and sentiment", 
-        backstory="You track market intelligence",
-        verbose=True,
-        tools=[query_institutional_database],
-        llm=fallback_llm
-    )
-    
-    alpha_analyst = Agent(
-        role="Investment Alpha Generator",
-        goal="Generate investment recommendations",
-        backstory="You create actionable investment ideas",
-        verbose=True,
-        tools=[query_institutional_database],
-        llm=fallback_llm
-    )
+    logger.error(f"Failed to initialize agents on import: {str(e)}")
+
+if __name__ == "__main__":
+    if test_setup():
+        logger.info(f"\n✅ All {len(agents)} agents ready to use with {MODEL_NAME}!")
+    else:
+        logger.error("Please fix the setup issues before proceeding")

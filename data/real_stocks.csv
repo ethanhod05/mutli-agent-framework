@@ -1,0 +1,31 @@
+Ticker,Company Name,Sector,Market Cap
+AAPL,Apple Inc,Technology,0
+MSFT,Microsoft Corp,Technology,0
+NVDA,NVIDIA Corp,Technology,0
+GOOGL,Alphabet Inc,Communication Services,0
+META,Meta Platforms,Communication Services,0
+TSLA,Tesla Inc,Consumer Discretionary,0
+AMZN,Amazon.com Inc,Consumer Discretionary,0
+BRK-B,Berkshire Hathaway,Financials,0
+JPM,JPMorgan Chase,Financials,0
+V,Visa Inc,Financials,0
+UNH,UnitedHealth Group,Healthcare,0
+JNJ,Johnson & Johnson,Healthcare,0
+LLY,Eli Lilly,Healthcare,0
+PG,Procter & Gamble,Consumer Staples,0
+XOM,Exxon Mobil,Energy,0
+COST,Costco Wholesale,Consumer Staples,0
+WMT,Walmart Inc,Consumer Staples,0
+MA,Mastercard,Financials,0
+HD,Home Depot,Consumer Discretionary,0
+PFE,Pfizer Inc,Healthcare,0
+DIS,Walt Disney,Communication Services,0
+NFLX,Netflix Inc,Communication Services,0
+ADBE,Adobe Inc,Technology,0
+CRM,Salesforce Inc,Technology,0
+ORCL,Oracle Corp,Technology,0
+AMD,Advanced Micro Devices,Technology,0
+INTC,Intel Corp,Technology,0
+BA,Boeing Co,Industrials,0
+CAT,Caterpillar Inc,Industrials,0
+GE,General Electric,Industrials,0
