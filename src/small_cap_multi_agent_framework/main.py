@@ -48,38 +48,10 @@ class SmallCapAnalysisSystem:
     
     def __init__(self):
         self.system_start_time = datetime.now()
-        self.version = "2.0.0"  # Updated for GPT-5-mini
-        self.model = self._detect_model()
+        self.version = "2.1.0"
+        self.model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         logger.info(f"Small Cap Multi-Agent Framework v{self.version} initialized")
         logger.info(f"Using model: {self.model}")
-    
-    def _detect_model(self) -> str:
-        """Detect which GPT model is available."""
-        try:
-            from openai import OpenAI
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            
-            # Try GPT-5-mini first
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-5-mini",
-                    messages=[{"role": "user", "content": "test"}],
-                    max_tokens=1
-                )
-                return "gpt-5-mini"
-            except:
-                # Fallback to gpt-4o-mini
-                try:
-                    response = client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[{"role": "user", "content": "test"}],
-                        max_tokens=1
-                    )
-                    return "gpt-4o-mini"
-                except:
-                    return "Model detection failed"
-        except:
-            return "OpenAI API not configured"
     
     def validate_environment(self) -> bool:
         """Validate system environment and dependencies."""
@@ -120,15 +92,7 @@ class SmallCapAnalysisSystem:
                 print("   ⚠️  No CSV files found in data/ directory")
                 self.create_sample_data()
             
-            # Check model availability
             print(f"   🤖 Model: {self.model}")
-            if self.model == "gpt-5-mini":
-                print("   ✅ Using latest GPT-5-mini model")
-            elif self.model == "gpt-4o-mini":
-                print("   ✅ Using GPT-4o-mini (GPT-5 not available yet)")
-            else:
-                print(f"   ⚠️  Model status: {self.model}")
-            
             print("✅ ENVIRONMENT VALIDATION COMPLETED\n")
             return True
             
@@ -179,49 +143,56 @@ class SmallCapAnalysisSystem:
         print("=" * 80)
         print()
     
-    def run_analysis(self, input_file: str = None, verbose: bool = True) -> dict:
-        """Execute complete institutional analysis workflow."""
-        
+    def run_analysis(self, input_file: str = None, tickers: list = None, verbose: bool = True) -> dict:
+        """Execute complete institutional analysis workflow.
+
+        Pass `tickers` for an ad-hoc lookup on specific tickers (bypasses the
+        CSV entirely), or `input_file` for a batch CSV run. Defaults to the
+        sample CSV if neither is given.
+        """
+
         if verbose:
             self.display_system_banner()
-        
+
         # Environment validation
         if not self.validate_environment():
             return {'status': 'failed', 'error': 'Environment validation failed'}
-        
-        # Determine input file
-        if input_file is None:
-            input_file = "data/small_caps_input.csv"
-        
-        if not Path(input_file).exists():
-            error_msg = f"Input file not found: {input_file}"
-            print(f"❌ {error_msg}")
-            return {'status': 'failed', 'error': error_msg}
-        
-        print(f"📁 INPUT FILE: {input_file}")
-        
-        # Validate input data
-        try:
-            df = pd.read_csv(input_file)
-            print(f"📊 DATASET: {len(df)} securities loaded for analysis")
-            print(f"📋 COLUMNS: {list(df.columns)}")
+
+        if tickers:
+            print(f"🎯 TICKERS: {', '.join(tickers)}")
             print()
-        except Exception as e:
-            error_msg = f"Failed to read input file: {str(e)}"
-            print(f"❌ {error_msg}")
-            return {'status': 'failed', 'error': error_msg}
-        
+        else:
+            if input_file is None:
+                input_file = "data/small_caps_input.csv"
+
+            if not Path(input_file).exists():
+                error_msg = f"Input file not found: {input_file}"
+                print(f"❌ {error_msg}")
+                return {'status': 'failed', 'error': error_msg}
+
+            print(f"📁 INPUT FILE: {input_file}")
+
+            try:
+                df = pd.read_csv(input_file)
+                print(f"📊 DATASET: {len(df)} securities loaded for analysis")
+                print(f"📋 COLUMNS: {list(df.columns)}")
+                print()
+            except Exception as e:
+                error_msg = f"Failed to read input file: {str(e)}"
+                print(f"❌ {error_msg}")
+                return {'status': 'failed', 'error': error_msg}
+
         # Execute institutional analysis
         print("🚀 LAUNCHING INSTITUTIONAL ANALYSIS WORKFLOW...")
         print("   → Data Quality Assurance Agent")
-        print("   → Fundamental Research Agent") 
+        print("   → Fundamental Research Agent")
         print("   → Market Intelligence Agent")
         print("   → Alpha Generation Agent")
         print()
-        
+
         try:
-            results = run_institutional_analysis(input_file)
-            
+            results = run_institutional_analysis(input_file=input_file, tickers=tickers)
+
             if results['status'] == 'success':
                 self.display_success_summary(results)
             else:
@@ -237,28 +208,35 @@ class SmallCapAnalysisSystem:
     
     def display_success_summary(self, results: dict):
         """Display professional success summary."""
-        print("=" * 80)
-        print("🎯 INSTITUTIONAL ANALYSIS COMPLETED SUCCESSFULLY")
-        print("=" * 80)
-        
         summary = results.get('summary', {})
-        
+        grounding_passed = summary.get('grounding_passed', True)
+
+        print("=" * 80)
+        if grounding_passed:
+            print("🎯 INSTITUTIONAL ANALYSIS COMPLETED - GROUNDING PASSED")
+        else:
+            print("⚠️  ANALYSIS COMPLETED BUT GROUNDING FAILED EVEN AFTER RETRY - REVIEW BEFORE TRUSTING")
+        print("=" * 80)
+
         print(f"🤖 Model Used: {results.get('model', self.model)}")
         print(f"📊 Analysis Date: {summary.get('analysis_date', 'N/A')}")
         print(f"🆔 Execution ID: {summary.get('execution_id', 'N/A')}")
         print(f"⚡ Processing: {summary.get('agent_count', 4)} agents, {summary.get('task_count', 4)} tasks")
         print(f"📁 Output Files: {len(summary.get('output_files', []))} reports generated")
+
+        if 'ticker_grounding_rate' in summary:
+            print(f"✅ Ticker grounding: {summary['ticker_grounding_rate'] * 100:.0f}%")
+            print(f"✅ Numeric grounding: {summary['numeric_grounding_rate'] * 100:.0f}%"
+                  f"{' (after 1 retry)' if summary.get('grounding_retried') else ''}")
+            if summary.get('ungrounded_tickers'):
+                print(f"⚠️  Ungrounded tickers: {summary['ungrounded_tickers']}")
         print()
-        
+
         print("📋 GENERATED REPORTS:")
         for output_file in summary.get('output_files', []):
             file_size = Path(output_file).stat().st_size if Path(output_file).exists() else 0
             print(f"   📄 {output_file} ({file_size:,} bytes)")
-        
-        print()
-        print("✅ SYSTEM STATUS: All institutional systems operational")
-        print("🔒 COMPLIANCE: Audit trail maintained") 
-        print("📈 READY: Investment recommendations available for review")
+
         print("=" * 80)
     
     def display_failure_summary(self, results: dict):
@@ -286,38 +264,50 @@ def main():
         epilog="""
 Examples:
   python main.py                                    # Run with default sample data
-  python main.py --input data/custom_stocks.csv    # Run with custom dataset
-  python main.py --quiet                           # Run with minimal output
-  
-Powered by GPT-5-mini (or GPT-4o-mini fallback)
+  python main.py --input data/custom_stocks.csv     # Run with custom dataset
+  python main.py --tickers AAPL,TSLA,SMLR           # Analyze specific tickers directly
+  python main.py --quiet                            # Run with minimal output
         """
     )
-    
+
     parser.add_argument(
         '--input', '-i',
         type=str,
         default=None,
         help='Path to input CSV file containing small-cap stocks (default: data/small_caps_input.csv)'
     )
-    
+
+    parser.add_argument(
+        '--tickers', '-t',
+        type=str,
+        default=None,
+        help='Comma-separated tickers to analyze directly, e.g. AAPL,TSLA (bypasses --input)'
+    )
+
     parser.add_argument(
         '--quiet', '-q',
         action='store_true',
         help='Run in quiet mode with minimal output'
     )
-    
+
     parser.add_argument(
         '--version', '-v',
         action='version',
-        version='Small Cap Multi-Agent Framework v2.0.0 (GPT-5-mini)'
+        version='Small Cap Multi-Agent Framework v2.1.0'
     )
-    
+
     args = parser.parse_args()
-    
+
+    if args.tickers and args.input:
+        parser.error("--input and --tickers are mutually exclusive")
+
+    tickers = [t.strip().upper() for t in args.tickers.split(',') if t.strip()] if args.tickers else None
+
     # Initialize and run analysis system
     system = SmallCapAnalysisSystem()
     results = system.run_analysis(
         input_file=args.input,
+        tickers=tickers,
         verbose=not args.quiet
     )
     

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Small-Cap Squad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%230f0c1d'/%3E%3Crect x='5' y='2' width='6' height='2' fill='%23ffd24d'/%3E%3Crect x='3' y='4' width='10' height='8' fill='%23ffd24d'/%3E%3Crect x='1' y='6' width='2' height='4' fill='%23ffd24d'/%3E%3Crect x='13' y='6' width='2' height='4' fill='%23ffd24d'/%3E%3Crect x='5' y='7' width='2' height='2' fill='%231a1730'/%3E%3Crect x='9' y='7' width='2' height='2' fill='%231a1730'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<header class="title-bar">
+  <h1>SMALL-CAP SQUAD</h1>
+  <p class="subtitle">a self-checking investment research party</p>
+  <div id="stats-bar" class="stats-bar">
+    <span>REAL TOOL CALLS: <strong id="stat-tool-calls">0</strong></span>
+    <span>RUNS PLAYED: <strong id="stat-runs">0</strong></span>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- CONTROL PANEL -->
+  <section class="panel control-panel">
+    <h2>&gt; NEW QUEST</h2>
+
+    <div class="mode-toggle">
+      <button id="mode-custom" class="mode-btn active">CUSTOM TICKERS</button>
+      <button id="mode-default" class="mode-btn">DEFAULT SQUAD UNIVERSE</button>
+    </div>
+
+    <div id="ticker-input-row">
+      <input id="ticker-input" type="text" placeholder="AAPL, TSLA, SMLR ..." autocomplete="off">
+    </div>
+
+    <button id="analyze-btn" class="big-btn">ANALYZE!</button>
+
+    <p id="status-line" class="status-line">Ready.</p>
+
+    <button id="history-toggle" class="link-btn">&gt; view run history</button>
+    <div id="history-panel" class="history-panel hidden"></div>
+  </section>
+
+  <!-- BATTLE ARENA -->
+  <section class="panel arena-panel">
+    <h2>&gt; THE PARTY</h2>
+    <div id="arena" class="arena">
+      <!-- sprite slots injected by JS -->
+    </div>
+
+    <div id="grounding-meter-wrap" class="grounding-wrap hidden">
+      <div class="grounding-label">GROUNDING CHECK</div>
+      <div class="hp-bar-outer">
+        <div id="grounding-bar" class="hp-bar-inner"></div>
+      </div>
+      <div id="grounding-text" class="grounding-text">--</div>
+    </div>
+
+    <div id="battle-log" class="battle-log"></div>
+  </section>
+
+  <!-- REPORT PANEL -->
+  <section class="panel report-panel">
+    <div class="report-header">
+      <h2>&gt; QUEST REPORT</h2>
+      <button id="download-btn" class="link-btn hidden">&gt; download .md</button>
+    </div>
+    <div id="report-empty" class="report-empty">No report yet. Send the party on a quest!</div>
+    <div id="report-content" class="report-content hidden"></div>
+  </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
