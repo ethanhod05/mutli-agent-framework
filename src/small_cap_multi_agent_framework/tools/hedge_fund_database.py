@@ -264,10 +264,13 @@ RECENT NEWS:
 """
         
         for i, item in enumerate(news[:5], 1):
-            title = item.get('title', 'No title')
-            publisher = item.get('publisher', 'Unknown')
-            link = item.get('link', '')
-            
+            # yfinance nests article fields under 'content' as of the current schema;
+            # fall back to the old flat fields in case that changes again.
+            content = item.get('content', item)
+            title = content.get('title', 'No title')
+            publisher = content.get('provider', {}).get('displayName') or item.get('publisher', 'Unknown')
+            link = content.get('canonicalUrl', {}).get('url') or item.get('link', '')
+
             # Simple sentiment based on keywords
             sentiment = "Neutral"
             positive_words = ['beat', 'exceed', 'upgrade', 'growth', 'profit', 'gain']
