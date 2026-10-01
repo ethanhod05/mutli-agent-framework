@@ -35,24 +35,28 @@ def main():
         print("Run history file is empty.")
         return
 
-    header = f"{'execution_id':<17} {'timestamp':<20} {'source':<28} {'tickers':>7} {'numbers':>7} {'retry':>5} {'passed':>6}"
+    header = f"{'execution_id':<17} {'source':<22} {'tickers':>7} {'numbers':>7} {'thesis':>7} {'retry':>5} {'passed':>6}"
     print(header)
     print("-" * len(header))
     for r in records:
-        source = (r.get('source') or '')[:28]
+        source = (r.get('source') or '')[:22]
         tg = r.get('ticker_grounding_rate')
         ng = r.get('numeric_grounding_rate')
+        tc = r.get('thesis_consistency_rate')
         print(
-            f"{r['execution_id']:<17} {r['timestamp'][:19]:<20} {source:<28} "
+            f"{r['execution_id']:<17} {source:<22} "
             f"{f'{tg*100:.0f}%' if tg is not None else 'n/a':>7} "
             f"{f'{ng*100:.0f}%' if ng is not None else 'n/a':>7} "
+            f"{f'{tc*100:.0f}%' if tc is not None else 'n/a':>7} "
             f"{'yes' if r.get('retried') else 'no':>5} "
             f"{'yes' if r.get('grounding_passed') else 'NO':>6}"
         )
 
     passed = sum(1 for r in records if r.get('grounding_passed'))
     retried = sum(1 for r in records if r.get('retried'))
+    inconsistent = sum(1 for r in records if r.get('inconsistent_tickers'))
     print(f"\n{passed}/{len(records)} runs passed grounding ({retried} needed a retry to get there).")
+    print(f"{len(records) - inconsistent}/{len(records)} runs had fully consistent theses.")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ from small_cap_multi_agent_framework.config.tasks import (
 from small_cap_multi_agent_framework.tools.hedge_fund_database import hedge_fund_db
 from small_cap_multi_agent_framework.utils.tracing import RunTracer
 from small_cap_multi_agent_framework.evals.grounding import evaluate_grounding
+from small_cap_multi_agent_framework.evals.thesis_consistency import evaluate_thesis_consistency
+from small_cap_multi_agent_framework.evals.outcomes import extract_calls_for_logging, log_outcomes
 import json
 import logging
 from datetime import datetime
@@ -157,17 +159,29 @@ class InstitutionalAnalysisCrew:
             eval_result = self._run_grounding_eval()
             self._emit("grounding_result", **eval_result)
 
-            if self._grounding_failed(eval_result):
-                logger.warning(
-                    f"Grounding check failed - ungrounded tickers: {eval_result['ungrounded_tickers']}, "
-                    f"numeric grounding: {eval_result['numeric_grounding_rate'] * 100:.0f}%. Retrying synthesis..."
-                )
-                self._emit("retry_started", ungrounded_tickers=eval_result["ungrounded_tickers"])
-                eval_result = self._retry_synthesis_with_correction(eval_result)
-                self._emit("grounding_result", **eval_result)
+            thesis_result = self._run_thesis_eval()
+            self._emit("thesis_result", **thesis_result)
 
-            summary = self._generate_execution_summary(start_time, eval_result)
-            self._log_run_history(summary, eval_result)
+            if self._grounding_failed(eval_result) or self._thesis_failed(thesis_result):
+                logger.warning(
+                    f"Quality check failed - ungrounded tickers: {eval_result['ungrounded_tickers']}, "
+                    f"thesis-inconsistent tickers: {thesis_result['inconsistent_tickers']}. "
+                    f"Retrying synthesis..."
+                )
+                self._emit(
+                    "retry_started",
+                    ungrounded_tickers=eval_result["ungrounded_tickers"],
+                    inconsistent_tickers=thesis_result["inconsistent_tickers"],
+                )
+                eval_result, thesis_result = self._retry_synthesis_with_correction(eval_result, thesis_result)
+                self._emit("grounding_result", **eval_result)
+                self._emit("thesis_result", **thesis_result)
+
+            if not self._grounding_failed(eval_result):
+                self._log_call_outcomes()
+
+            summary = self._generate_execution_summary(start_time, eval_result, thesis_result)
+            self._log_run_history(summary, eval_result, thesis_result)
 
             logger.info("=" * 80)
             logger.info("ANALYSIS COMPLETED")
@@ -241,7 +255,52 @@ class InstitutionalAnalysisCrew:
             or eval_result.get("numeric_grounding_rate", 1.0) < NUMERIC_GROUNDING_RETRY_THRESHOLD
         )
 
-    def _retry_synthesis_with_correction(self, failed_eval: dict) -> dict:
+    def _run_thesis_eval(self) -> dict:
+        """Check whether each ticker's call is directionally consistent with
+        the real fundamentals it was given - a different question from
+        grounding (are the numbers real)."""
+        report_path = self.output_dir / f"alpha_investment_report_{self.execution_id}.md"
+        report_text = report_path.read_text() if report_path.exists() else ""
+
+        result = evaluate_thesis_consistency(report_text, self.tracer.events)
+
+        thesis_file = self.output_dir / f"thesis_eval_{self.execution_id}.json"
+        with open(thesis_file, 'w') as f:
+            json.dump(result, f, indent=2)
+
+        return result
+
+    def _thesis_failed(self, thesis_result: dict) -> bool:
+        return bool(thesis_result.get("inconsistent_tickers"))
+
+    def _build_correction_notes(self, failed_grounding: dict, failed_thesis: dict) -> str:
+        notes = []
+        if failed_grounding.get("ungrounded_tickers"):
+            notes.append(
+                f"Your previous attempt discussed tickers that were never provided to you: "
+                f"{', '.join(failed_grounding['ungrounded_tickers'])}. Do not mention any ticker "
+                f"outside the list below."
+            )
+        for t in failed_grounding.get("per_ticker", []):
+            if t.get("unverified_numbers"):
+                notes.append(
+                    f"For {t['ticker']}, you previously stated numbers that don't appear in the "
+                    f"data you were given ({t['unverified_numbers']}). Use only figures that "
+                    f"literally appear in the context above."
+                )
+        for t in failed_thesis.get("per_ticker", []):
+            if t.get("applicable") and not t.get("consistent"):
+                notes.append(
+                    f"For {t['ticker']}, your {t['call']} call doesn't match the fundamental "
+                    f"signals you were given ({t['reason']}). Either change your call to match "
+                    f"the data, or explicitly address why you're calling against the fundamentals."
+                )
+        return (
+            "CORRECTION REQUIRED - your previous attempt failed an automated quality check:\n"
+            + "\n".join(f"- {n}" for n in notes)
+        )
+
+    def _retry_synthesis_with_correction(self, failed_grounding: dict, failed_thesis: dict) -> tuple:
         """Re-run only the synthesis step with the specific failures named explicitly.
 
         Reuses the already-executed context tasks (fundamentals/news/quality) via
@@ -252,24 +311,7 @@ class InstitutionalAnalysisCrew:
         if report_path.exists():
             report_path.rename(self.output_dir / f"alpha_investment_report_{self.execution_id}_attempt1.md")
 
-        correction_notes = []
-        if failed_eval["ungrounded_tickers"]:
-            correction_notes.append(
-                f"Your previous attempt discussed tickers that were never provided to you: "
-                f"{', '.join(failed_eval['ungrounded_tickers'])}. Do not mention any ticker "
-                f"outside the list below."
-            )
-        for t in failed_eval["per_ticker"]:
-            if t["unverified_numbers"]:
-                correction_notes.append(
-                    f"For {t['ticker']}, you previously stated numbers that don't appear in the "
-                    f"data you were given ({t['unverified_numbers']}). Use only figures that "
-                    f"literally appear in the context above."
-                )
-        correction = (
-            "CORRECTION REQUIRED - your previous attempt failed an automated grounding check:\n"
-            + "\n".join(f"- {n}" for n in correction_notes)
-        )
+        correction = self._build_correction_notes(failed_grounding, failed_thesis)
 
         context_tasks = self.crew.tasks[:-1]
         retry_task = create_alpha_generation_task(
@@ -287,15 +329,33 @@ class InstitutionalAnalysisCrew:
         retry_crew.kickoff()
         self._strip_leaked_thought_from_report()
 
-        new_eval = self._run_grounding_eval()
-        new_eval["retried"] = True
-        new_eval["pre_retry_eval"] = failed_eval
-        logger.info(
-            f"Retry {'fixed' if not self._grounding_failed(new_eval) else 'did not fix'} the grounding failure"
-        )
-        return new_eval
+        new_grounding = self._run_grounding_eval()
+        new_grounding["retried"] = True
+        new_grounding["pre_retry_eval"] = failed_grounding
 
-    def _log_run_history(self, summary: dict, eval_result: dict) -> None:
+        new_thesis = self._run_thesis_eval()
+        new_thesis["retried"] = True
+
+        fixed = not (self._grounding_failed(new_grounding) or self._thesis_failed(new_thesis))
+        logger.info(f"Retry {'fixed' if fixed else 'did not fully fix'} the quality check failure")
+        return new_grounding, new_thesis
+
+    def _log_call_outcomes(self) -> None:
+        """Log each real BUY/HOLD/SELL call with its real price-at-call, for
+        later scoring once enough time has passed (scripts/score_outcomes.py).
+        Only called for reports that passed grounding - an ungrounded report's
+        price figures aren't trustworthy enough to anchor a track record to.
+        """
+        report_path = self.output_dir / f"alpha_investment_report_{self.execution_id}.md"
+        if not report_path.exists():
+            return
+        report_text = report_path.read_text()
+        records = extract_calls_for_logging(report_text, self.tracer.events, self.execution_id)
+        log_outcomes(records, self.output_dir / "call_outcomes.jsonl")
+        if records:
+            logger.info(f"Logged {len(records)} call(s) for future outcome scoring")
+
+    def _log_run_history(self, summary: dict, eval_result: dict, thesis_result: dict) -> None:
         """Append this run's outcome to a persistent history for trend analysis over time."""
         record = {
             'execution_id': self.execution_id,
@@ -307,6 +367,8 @@ class InstitutionalAnalysisCrew:
             'ticker_grounding_rate': eval_result.get('ticker_grounding_rate'),
             'numeric_grounding_rate': eval_result.get('numeric_grounding_rate'),
             'ungrounded_tickers': eval_result.get('ungrounded_tickers', []),
+            'thesis_consistency_rate': thesis_result.get('thesis_consistency_rate'),
+            'inconsistent_tickers': thesis_result.get('inconsistent_tickers', []),
             'retried': eval_result.get('retried', False),
             'grounding_passed': summary['grounding_passed'],
         }
@@ -314,7 +376,7 @@ class InstitutionalAnalysisCrew:
         with open(history_file, 'a') as f:
             f.write(json.dumps(record) + "\n")
 
-    def _generate_execution_summary(self, start_time: datetime, eval_result: dict) -> dict:
+    def _generate_execution_summary(self, start_time: datetime, eval_result: dict, thesis_result: dict) -> dict:
         """Generate an execution summary containing only facts derived from this run."""
 
         output_files = [
@@ -338,6 +400,9 @@ class InstitutionalAnalysisCrew:
             'ungrounded_tickers': eval_result.get('ungrounded_tickers', []),
             'grounding_retried': eval_result.get('retried', False),
             'grounding_passed': not self._grounding_failed(eval_result),
+            'thesis_consistency_rate': thesis_result.get('thesis_consistency_rate'),
+            'inconsistent_tickers': thesis_result.get('inconsistent_tickers', []),
+            'thesis_passed': not self._thesis_failed(thesis_result),
         }
 
         summary_file = self.output_dir / f"execution_summary_{self.execution_id}.json"
@@ -374,6 +439,11 @@ def run_institutional_analysis(input_file: str = None, tickers: list = None, on_
                   f"{', after 1 retry' if summary['grounding_retried'] else ''})")
         else:
             print(f"Grounding: FAILED even after retry - ungrounded tickers: {summary['ungrounded_tickers']}")
+
+        if summary['thesis_passed']:
+            print(f"Thesis consistency: PASSED ({summary['thesis_consistency_rate'] * 100:.0f}%)")
+        else:
+            print(f"Thesis consistency: FAILED even after retry - inconsistent calls: {summary['inconsistent_tickers']}")
 
         print("\nGENERATED REPORTS:")
         for output_file in summary['output_files']:

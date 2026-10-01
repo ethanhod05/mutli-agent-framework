@@ -19,6 +19,7 @@
   <div id="stats-bar" class="stats-bar">
     <span>REAL TOOL CALLS: <strong id="stat-tool-calls">0</strong></span>
     <span>RUNS PLAYED: <strong id="stat-runs">0</strong></span>
+    <button id="sound-toggle" class="sound-toggle" title="Toggle sound">&#128266;</button>
   </div>
 </header>
 
@@ -37,6 +38,8 @@
       <input id="ticker-input" type="text" placeholder="AAPL, TSLA, SMLR ..." autocomplete="off">
     </div>
 
+    <button id="shuffle-btn" class="link-btn">&#127922; synthesize a new 5-ticker squad</button>
+
     <button id="analyze-btn" class="big-btn">ANALYZE!</button>
 
     <p id="status-line" class="status-line">Ready.</p>
@@ -45,11 +48,18 @@
     <div id="history-panel" class="history-panel hidden"></div>
   </section>
 
-  <!-- BATTLE ARENA -->
+  <!-- PRICE CHARTS -->
+  <section id="charts-panel" class="panel charts-panel hidden">
+    <h2>&gt; PRICE HISTORY</h2>
+    <div id="charts-grid" class="charts-grid"></div>
+  </section>
+
+  <!-- THE OFFICE -->
   <section class="panel arena-panel">
-    <h2>&gt; THE PARTY</h2>
-    <div id="arena" class="arena">
-      <!-- sprite slots injected by JS -->
+    <h2>&gt; THE OFFICE</h2>
+    <div id="arena" class="office-scene">
+      <canvas id="office-bg"></canvas>
+      <!-- desks and agents injected by JS -->
     </div>
 
     <div id="grounding-meter-wrap" class="grounding-wrap hidden">
@@ -58,6 +68,14 @@
         <div id="grounding-bar" class="hp-bar-inner"></div>
       </div>
       <div id="grounding-text" class="grounding-text">--</div>
+    </div>
+
+    <div id="thesis-meter-wrap" class="grounding-wrap hidden">
+      <div class="grounding-label">THESIS CONSISTENCY</div>
+      <div class="hp-bar-outer">
+        <div id="thesis-bar" class="hp-bar-inner"></div>
+      </div>
+      <div id="thesis-text" class="grounding-text">--</div>
     </div>
 
     <div id="battle-log" class="battle-log"></div>
@@ -71,6 +89,14 @@
     </div>
     <div id="report-empty" class="report-empty">No report yet. Send the party on a quest!</div>
     <div id="report-content" class="report-content hidden"></div>
+  </section>
+
+  <!-- TRACK RECORD -->
+  <section class="panel track-panel">
+    <h2>&gt; TRACK RECORD <span class="track-subtitle">(real price checks on past calls, &ge; 7 days old)</span></h2>
+    <div id="track-content">
+      <p class="report-empty">Loading...</p>
+    </div>
   </section>
 
 </main>

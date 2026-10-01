@@ -210,12 +210,13 @@ class SmallCapAnalysisSystem:
         """Display professional success summary."""
         summary = results.get('summary', {})
         grounding_passed = summary.get('grounding_passed', True)
+        thesis_passed = summary.get('thesis_passed', True)
 
         print("=" * 80)
-        if grounding_passed:
-            print("🎯 INSTITUTIONAL ANALYSIS COMPLETED - GROUNDING PASSED")
+        if grounding_passed and thesis_passed:
+            print("🎯 INSTITUTIONAL ANALYSIS COMPLETED - ALL QUALITY CHECKS PASSED")
         else:
-            print("⚠️  ANALYSIS COMPLETED BUT GROUNDING FAILED EVEN AFTER RETRY - REVIEW BEFORE TRUSTING")
+            print("⚠️  ANALYSIS COMPLETED BUT A QUALITY CHECK FAILED EVEN AFTER RETRY - REVIEW BEFORE TRUSTING")
         print("=" * 80)
 
         print(f"🤖 Model Used: {results.get('model', self.model)}")
@@ -230,6 +231,10 @@ class SmallCapAnalysisSystem:
                   f"{' (after 1 retry)' if summary.get('grounding_retried') else ''}")
             if summary.get('ungrounded_tickers'):
                 print(f"⚠️  Ungrounded tickers: {summary['ungrounded_tickers']}")
+        if 'thesis_consistency_rate' in summary:
+            print(f"✅ Thesis consistency: {summary['thesis_consistency_rate'] * 100:.0f}%")
+            if summary.get('inconsistent_tickers'):
+                print(f"⚠️  Calls that don't match their own fundamentals: {summary['inconsistent_tickers']}")
         print()
 
         print("📋 GENERATED REPORTS:")
