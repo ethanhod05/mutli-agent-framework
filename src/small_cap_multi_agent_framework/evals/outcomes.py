@@ -23,21 +23,15 @@ from pathlib import Path
 
 import yfinance as yf
 
+from small_cap_multi_agent_framework.evals._report_parsing import (
+    TICKER_HEADING_RE, ticker_section, extract_call,
+)
+
 MIN_HOLD_DAYS = 7
 HOLD_BAND_PCT = 5.0  # a HOLD is scored "correct" if price moved less than this either way
 
-CALL_RE = re.compile(r"\b(BUY|HOLD|SELL)\b", re.IGNORECASE)
-TICKER_HEADING_RE = re.compile(r"^##\s*([A-Z][A-Z.\-]{0,5})\b", re.MULTILINE)
 TICKER_INPUT_RE = re.compile(r'"ticker"\s*:\s*"([A-Z.\-]+)"')
 PRICE_RE = re.compile(r"Current Price[:\s]+\$?(-?[\d,]+\.?\d*)", re.IGNORECASE)
-
-
-def _ticker_section(report_text: str, ticker: str) -> str:
-    pattern = re.compile(
-        rf"##\s*{re.escape(ticker)}\b.*?(?=\n##\s|\Z)", re.DOTALL | re.IGNORECASE
-    )
-    match = pattern.search(report_text)
-    return match.group(0) if match else report_text
 
 
 def _fundamentals_text_for_ticker(trace_events: list, ticker: str) -> str:
@@ -63,9 +57,9 @@ def extract_calls_for_logging(report_text: str, trace_events: list, execution_id
     tickers = sorted(set(TICKER_HEADING_RE.findall(report_text)))
     records = []
     for ticker in tickers:
-        section = _ticker_section(report_text, ticker)
-        call_match = CALL_RE.search(section)
-        if not call_match:
+        section = ticker_section(report_text, ticker)
+        call = extract_call(section)
+        if not call:
             continue
 
         fundamentals_text = _fundamentals_text_for_ticker(trace_events, ticker)
@@ -84,7 +78,7 @@ def extract_calls_for_logging(report_text: str, trace_events: list, execution_id
         records.append({
             "execution_id": execution_id,
             "ticker": ticker,
-            "call": call_match.group(1).upper(),
+            "call": call,
             "price_at_call": price_at_call,
             "call_date": datetime.now().strftime("%Y-%m-%d"),
             "logged_at": datetime.now().isoformat(),

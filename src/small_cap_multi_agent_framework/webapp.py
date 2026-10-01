@@ -31,6 +31,33 @@ from small_cap_multi_agent_framework.evals.outcomes import score_outcomes
 
 VALID_PERIODS = {"6mo", "1y", "2y", "5y"}
 
+# Matches the exact format hedge_fund_database.py's _get_yfinance_news writes -
+# keep the two in sync. This parses the real, saved tool output (what the news
+# agent actually saw in this run), not a fresh live query, so clicking through
+# shows the exact source a report's sentiment claim was based on.
+NEWS_ARTICLE_RE = re.compile(
+    r"^\d+\.\s+(?P<title>.+?)\n"
+    r"\s*Publisher:\s*(?P<publisher>.+?)\n"
+    r"\s*Date:\s*(?P<date>.+?)\n"
+    r"\s*Sentiment:\s*(?P<sentiment>\w+)\s*\(score:\s*(?P<score>[+-]?[\d.]+)\)\n"
+    r"\s*Link:\s*(?P<link>\S+)",
+    re.MULTILINE,
+)
+
+
+def parse_news_articles(news_text: str) -> list:
+    articles = []
+    for m in NEWS_ARTICLE_RE.finditer(news_text):
+        articles.append({
+            "title": m.group("title").strip(),
+            "publisher": m.group("publisher").strip(),
+            "date": m.group("date").strip(),
+            "sentiment": m.group("sentiment").strip(),
+            "score": float(m.group("score")),
+            "link": m.group("link").strip(),
+        })
+    return articles
+
 app = FastAPI(title="Small Cap Multi-Agent Framework")
 
 STATIC_DIR = Path(__file__).parent / "webapp_static"
@@ -169,6 +196,33 @@ def price_history(ticker: str, period: str = "2y"):
         "dates": [d.strftime("%Y-%m-%d") for d in hist.index],
         "closes": [round(float(c), 2) for c in hist["Close"]],
     }
+
+
+@app.get("/api/news/{execution_id}/{ticker}")
+def get_news(execution_id: str, ticker: str):
+    """Real headlines the news agent actually analyzed for this ticker in
+    this run - parsed from the saved trace, not a fresh live query, so this
+    shows exactly what a report's sentiment claim was based on. Click
+    through and verify it yourself; nothing here is paraphrased.
+    """
+    trace_path = OUTPUT_DIR / "traces" / f"trace_{execution_id}.json"
+    if not trace_path.exists():
+        return JSONResponse({"error": "no saved trace for this execution_id"}, status_code=404)
+
+    ticker = ticker.upper().strip()
+    trace_events = json.loads(trace_path.read_text()).get("events", [])
+
+    for event in trace_events:
+        if event.get("type") != "tool_call":
+            continue
+        tool_input = event.get("tool_input") or ""
+        if "news" not in tool_input:
+            continue
+        m = re.search(r'"ticker"\s*:\s*"([A-Z.\-]+)"', tool_input)
+        if m and m.group(1) == ticker:
+            return {"ticker": ticker, "articles": parse_news_articles(event.get("result", ""))}
+
+    return {"ticker": ticker, "articles": []}
 
 
 @app.get("/api/replay/{execution_id}")

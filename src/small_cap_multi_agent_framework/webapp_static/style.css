@@ -488,6 +488,8 @@ body {
 .report-content li { font-size: 17px; margin-bottom: 4px; }
 .report-content hr { border: none; border-top: 2px dashed var(--border); margin: 16px 0; }
 .report-content strong { color: var(--accent); }
+.report-content a { color: var(--border-light); text-decoration: underline; }
+.report-content a:hover { color: var(--accent); }
 
 /* ---------- Price charts ---------- */
 
@@ -660,3 +662,60 @@ body {
 
 .track-table .correct { color: var(--green); }
 .track-table .wrong { color: var(--red); }
+
+/* ---------- News sources ---------- */
+
+.news-sources {
+  background: rgba(13,11,26,0.5);
+  border-left: 2px solid var(--border);
+  padding: 6px 10px 2px;
+  margin: 6px 0 10px;
+}
+
+.news-sources-label {
+  font-family: var(--body-font);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.news-source-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.news-source-list li {
+  padding: 4px 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.news-source-list a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: rgba(139,132,196,0.5);
+}
+
+.news-source-list a:hover { color: var(--accent); }
+
+.sentiment-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 7px;
+  flex-shrink: 0;
+}
+
+.sentiment-dot.positive { background: var(--green); }
+.sentiment-dot.negative { background: var(--red); }
+.sentiment-dot.neutral { background: var(--text-dim); }
+
+.news-meta {
+  display: block;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 1px 0 0 15px;
+}

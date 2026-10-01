@@ -499,6 +499,16 @@ function clearLog() {
 // Minimal markdown renderer (no external dependency, tailored to our reports)
 // ============================================================================
 
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Matches a "**Investment Call:**" / "**Recommendation:**" / "**Call:**"
+// label, so the real verdict can be found even when an earlier line in the
+// section happens to contain the word "buy"/"sell" in passing - e.g. a news
+// headline like "...upgraded to Buy" that isn't the agent's own call.
+const CALL_HEADING_RE = /\*\*\s*(investment call|recommendation|call)\s*:?\s*\*\*/i;
+
 function extractCallStamps(md) {
   // One BUY/HOLD/SELL per '## TICKER' section, in document order, parallel
   // to the <h2> tags renderMarkdown produces (null if a section has no call).
@@ -506,7 +516,14 @@ function extractCallStamps(md) {
   const calls = [];
   for (const part of parts) {
     if (!/^##\s/.test(part)) continue;
-    const m = /\b(BUY|HOLD|SELL)\b/i.exec(part);
+    const headingMatch = CALL_HEADING_RE.exec(part);
+    // Search only after the call heading when one exists - the real verdict.
+    // Otherwise fall back to the last mention in the section (the
+    // conclusion), not the first, since an early line is more likely to be
+    // incidental (a quoted headline) than the agent's own final word.
+    const searchText = headingMatch ? part.slice(headingMatch.index) : part;
+    const matches = [...searchText.matchAll(/\b(BUY|HOLD|SELL)\b/gi)];
+    const m = matches[headingMatch ? 0 : matches.length - 1];
     calls.push(m ? m[1].toUpperCase() : null);
   }
   return calls;
@@ -518,9 +535,9 @@ function renderMarkdown(md) {
   let inList = false;
 
   const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
-  const inline = (s) => s
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const inline = (s) => escapeHtml(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
   for (const raw of lines) {
     const line = raw.trimEnd();
@@ -696,6 +713,83 @@ async function loadReport(executionId) {
   reportContent.classList.remove('hidden');
   reportContent.innerHTML = renderMarkdown(data.report);
   downloadBtn.classList.remove('hidden');
+  injectNewsSources(executionId);
+}
+
+// A heading-like paragraph is renderMarkdown's output for a "**Label:**" line
+// - a <p> (or <li>) whose content starts with a <strong>. Used to find where
+// the news/sentiment prose starts and ends within a ticker's section, since
+// the LLM's own wording for it varies run to run ("News Sentiment:",
+// "Recent News:", etc.) and can't be matched by one fixed string.
+function isFieldHeading(node, pattern) {
+  if (!node.querySelector) return false;
+  const strong = node.querySelector('strong');
+  return !!(strong && pattern.test(strong.textContent));
+}
+
+// Finds where to insert the sources block: right after the news/sentiment
+// content, before whatever field comes next (the investment call, usually).
+// Falls back to right after the call-stamp/heading if no news heading is
+// found at all, so the block still appears somewhere sensible.
+function findNewsInsertionPoint(h2) {
+  const sectionNodes = [];
+  for (let node = h2.nextElementSibling; node && node.tagName !== 'H2'; node = node.nextElementSibling) {
+    sectionNodes.push(node);
+  }
+
+  const newsStart = sectionNodes.findIndex(n => isFieldHeading(n, /news|sentiment/i));
+  if (newsStart === -1) {
+    return (sectionNodes[0] && sectionNodes[0].classList.contains('call-stamp')) ? sectionNodes[0] : h2;
+  }
+
+  for (let i = newsStart + 1; i < sectionNodes.length; i++) {
+    if (isFieldHeading(sectionNodes[i], /investment call|recommendation|^call\b/i)) {
+      return sectionNodes[i].previousElementSibling;
+    }
+  }
+  return sectionNodes[sectionNodes.length - 1];
+}
+
+// Fetches the real headlines the news agent actually saw for each ticker in
+// this run (from the saved trace, not a fresh query) and attaches them near
+// that ticker's news/sentiment prose as clickable links - so a reader can
+// verify the sentiment claim against its actual source instead of trusting it.
+async function injectNewsSources(executionId) {
+  const headings = reportContent.querySelectorAll('h2');
+  const fetches = Array.from(headings).map(async (h2) => {
+    const m = /^([A-Z][A-Z.\-]{0,5})\b/.exec(h2.textContent.trim());
+    if (!m) return;
+    const ticker = m[1];
+
+    let data;
+    try {
+      const res = await fetch(`/api/news/${executionId}/${ticker}`);
+      if (!res.ok) return;
+      data = await res.json();
+    } catch (e) {
+      return;
+    }
+    if (!data.articles || !data.articles.length) return;
+
+    const block = document.createElement('div');
+    block.className = 'news-sources';
+    block.innerHTML = `
+      <div class="news-sources-label">&#128240; Sources (click to verify)</div>
+      <ul class="news-source-list">
+        ${data.articles.map(a => `
+          <li>
+            <span class="sentiment-dot ${a.sentiment.toLowerCase()}" title="${a.sentiment} (${a.score >= 0 ? '+' : ''}${a.score.toFixed(2)})"></span>
+            <a href="${escapeHtml(a.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.title)}</a>
+            <span class="news-meta">${escapeHtml(a.publisher)} &middot; ${escapeHtml(a.date)}</span>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+
+    findNewsInsertionPoint(h2).after(block);
+  });
+
+  await Promise.all(fetches);
 }
 
 downloadBtn.addEventListener('click', () => {

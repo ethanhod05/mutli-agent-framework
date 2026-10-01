@@ -22,8 +22,9 @@ the goal is to catch fabricated numbers, not to grade writing quality.
 import re
 from dataclasses import dataclass, field
 
+from small_cap_multi_agent_framework.evals._report_parsing import TICKER_HEADING_RE
+
 NUMBER_RE = re.compile(r"-?\$?\d[\d,]*\.?\d*%?")
-TICKER_HEADING_RE = re.compile(r"^##\s*([A-Z][A-Z.\-]{0,5})\b", re.MULTILINE)
 TICKER_INPUT_RE = re.compile(r'"ticker"\s*:\s*"([A-Z.\-]+)"')
 TICKER_MENTION_RE = re.compile(r"\b([A-Z]{1,6}(?:\.[A-Z])?)\b")
 
