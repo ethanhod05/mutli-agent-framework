@@ -24,22 +24,16 @@ BUY or SELL is.
 
 import re
 
-CALL_RE = re.compile(r"\b(BUY|HOLD|SELL)\b", re.IGNORECASE)
-TICKER_HEADING_RE = re.compile(r"^##\s*([A-Z][A-Z.\-]{0,5})\b", re.MULTILINE)
+from small_cap_multi_agent_framework.evals._report_parsing import (
+    TICKER_HEADING_RE, ticker_section, extract_call,
+)
+
 TICKER_INPUT_RE = re.compile(r'"ticker"\s*:\s*"([A-Z.\-]+)"')
 
 # Inconsistency threshold: the fundamental score must point clearly against
 # the call (not just slightly) before it's flagged - avoids nagging about
 # close calls where a human analyst could reasonably go either way.
 INCONSISTENCY_THRESHOLD = 1.0
-
-
-def _ticker_section(report_text: str, ticker: str) -> str:
-    pattern = re.compile(
-        rf"##\s*{re.escape(ticker)}\b.*?(?=\n##\s|\Z)", re.DOTALL | re.IGNORECASE
-    )
-    match = pattern.search(report_text)
-    return match.group(0) if match else report_text
 
 
 def _fundamentals_text_for_ticker(trace_events: list, ticker: str) -> str:
@@ -125,9 +119,8 @@ def evaluate_thesis_consistency(report_text: str, trace_events: list) -> dict:
 
     per_ticker = []
     for ticker in tickers:
-        section = _ticker_section(report_text, ticker)
-        call_match = CALL_RE.search(section)
-        call = call_match.group(1).upper() if call_match else None
+        section = ticker_section(report_text, ticker)
+        call = extract_call(section)
 
         fundamentals_text = _fundamentals_text_for_ticker(trace_events, ticker)
         has_real_data = bool(fundamentals_text) and "No fundamental data available" not in fundamentals_text

@@ -15,6 +15,7 @@ import logging
 from pathlib import Path
 from crewai.tools import tool
 import yfinance as yf
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # Configure logging
 logging.basicConfig(
@@ -22,6 +23,37 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# VADER is a general-purpose lexicon, so finance jargon reads wrong by default
+# ("Micron Earnings Crush Views" scores negative because of "crush" alone,
+# even though crushing estimates is bullish). This small override layers
+# finance-specific valence on top of VADER's general lexicon rather than
+# replacing it - verified against real headlines before shipping.
+_FINANCE_LEXICON = {
+    'crush': 1.5, 'crushed': 1.5, 'beat': 1.8, 'beats': 1.8, 'topped': 1.2,
+    'soar': 2.0, 'soars': 2.0, 'surge': 2.0, 'surges': 2.0, 'rally': 1.5,
+    'upgrade': 1.8, 'upgraded': 1.8, 'outperform': 1.5, 'bullish': 1.8,
+    'miss': -1.8, 'misses': -1.8, 'missed': -1.8, 'plunge': -2.0, 'plunges': -2.0,
+    'downgrade': -1.8, 'downgraded': -1.8, 'underperform': -1.5, 'bearish': -1.8,
+    'slash': -1.5, 'slashed': -1.5, 'layoffs': -1.5, 'recall': -1.2,
+    'bankruptcy': -2.5, 'delisted': -2.0, 'investigation': -1.5,
+}
+
+_sentiment_analyzer = SentimentIntensityAnalyzer()
+_sentiment_analyzer.lexicon.update(_FINANCE_LEXICON)
+
+
+def _classify_sentiment(headline: str) -> tuple:
+    """Real sentiment scoring (VADER + a finance-jargon lexicon override),
+    not a hardcoded 6-word keyword list. Returns (label, compound_score)."""
+    compound = _sentiment_analyzer.polarity_scores(headline)['compound']
+    if compound >= 0.05:
+        label = "Positive"
+    elif compound <= -0.05:
+        label = "Negative"
+    else:
+        label = "Neutral"
+    return label, compound
 
 class HedgeFundDatabaseSystem:
     """
@@ -279,23 +311,16 @@ RECENT NEWS:
             title = content.get('title', 'No title')
             publisher = content.get('provider', {}).get('displayName') or item.get('publisher', 'Unknown')
             link = content.get('canonicalUrl', {}).get('url') or item.get('link', '')
+            pub_date = content.get('pubDate', '')[:10] or 'Unknown date'
 
-            # Simple sentiment based on keywords
-            sentiment = "Neutral"
-            positive_words = ['beat', 'exceed', 'upgrade', 'growth', 'profit', 'gain']
-            negative_words = ['miss', 'downgrade', 'loss', 'decline', 'cut', 'weak']
-            
-            title_lower = title.lower()
-            if any(word in title_lower for word in positive_words):
-                sentiment = "Positive 📈"
-            elif any(word in title_lower for word in negative_words):
-                sentiment = "Negative 📉"
-            
+            sentiment, score = _classify_sentiment(title)
+
             news_output += f"""
 {i}. {title}
    Publisher: {publisher}
-   Sentiment: {sentiment}
-   Link: {link[:50]}...
+   Date: {pub_date}
+   Sentiment: {sentiment} (score: {score:+.2f})
+   Link: {link}
 """
         
         return news_output
