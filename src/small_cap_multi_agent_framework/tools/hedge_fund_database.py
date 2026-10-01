@@ -24,19 +24,30 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# VADER is a general-purpose lexicon, so finance jargon reads wrong by default
-# ("Micron Earnings Crush Views" scores negative because of "crush" alone,
-# even though crushing estimates is bullish). This small override layers
-# finance-specific valence on top of VADER's general lexicon rather than
-# replacing it - verified against real headlines before shipping.
+# VADER is a general-purpose lexicon, so finance jargon reads wrong by
+# default ("Micron Earnings Crush Views" scores negative because VADER's own
+# base lexicon has "crush"/"crushes" as violence-adjacent words, even though
+# crushing estimates is bullish). This override layers finance-specific
+# valence on top. Every inflected form (crush/crushes/crushing) is listed
+# explicitly - dict.update() only overwrites the exact keys given, so a
+# missing inflection silently falls through to VADER's base score (or no
+# score at all) rather than the finance-correct one. A test suite caught
+# exactly this gap: "Crushes" and "Downgrades" were missing and scored wrong.
 _FINANCE_LEXICON = {
-    'crush': 1.5, 'crushed': 1.5, 'beat': 1.8, 'beats': 1.8, 'topped': 1.2,
-    'soar': 2.0, 'soars': 2.0, 'surge': 2.0, 'surges': 2.0, 'rally': 1.5,
-    'upgrade': 1.8, 'upgraded': 1.8, 'outperform': 1.5, 'bullish': 1.8,
-    'miss': -1.8, 'misses': -1.8, 'missed': -1.8, 'plunge': -2.0, 'plunges': -2.0,
-    'downgrade': -1.8, 'downgraded': -1.8, 'underperform': -1.5, 'bearish': -1.8,
-    'slash': -1.5, 'slashed': -1.5, 'layoffs': -1.5, 'recall': -1.2,
-    'bankruptcy': -2.5, 'delisted': -2.0, 'investigation': -1.5,
+    'crush': 1.5, 'crushes': 1.5, 'crushed': 1.5, 'crushing': 1.5,
+    'beat': 1.8, 'beats': 1.8, 'beating': 1.8, 'topped': 1.2, 'tops': 1.2,
+    'soar': 2.0, 'soars': 2.0, 'soaring': 2.0, 'soared': 2.0,
+    'surge': 2.0, 'surges': 2.0, 'surging': 2.0, 'surged': 2.0,
+    'rally': 1.5, 'rallies': 1.5, 'rallying': 1.5, 'rallied': 1.5,
+    'upgrade': 1.8, 'upgrades': 1.8, 'upgraded': 1.8, 'upgrading': 1.8,
+    'outperform': 1.5, 'outperforms': 1.5, 'outperformed': 1.5, 'bullish': 1.8,
+    'miss': -1.8, 'misses': -1.8, 'missed': -1.8, 'missing': -1.8,
+    'plunge': -2.0, 'plunges': -2.0, 'plunging': -2.0, 'plunged': -2.0,
+    'downgrade': -1.8, 'downgrades': -1.8, 'downgraded': -1.8, 'downgrading': -1.8,
+    'underperform': -1.5, 'underperforms': -1.5, 'underperformed': -1.5, 'bearish': -1.8,
+    'slash': -1.5, 'slashes': -1.5, 'slashed': -1.5, 'slashing': -1.5,
+    'layoffs': -1.5, 'layoff': -1.5, 'recall': -1.2, 'recalls': -1.2, 'recalled': -1.2,
+    'bankruptcy': -2.5, 'delisted': -2.0, 'delisting': -2.0, 'investigation': -1.5,
 }
 
 _sentiment_analyzer = SentimentIntensityAnalyzer()
