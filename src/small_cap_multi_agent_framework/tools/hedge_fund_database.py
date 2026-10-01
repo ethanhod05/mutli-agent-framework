@@ -162,11 +162,20 @@ def _get_yfinance_fundamentals(stock, ticker: str) -> str:
     """Get fundamental data from YFinance."""
     try:
         info = stock.info
-        
-        # Check if we got valid data
-        if not info or 'symbol' not in info:
+
+        # A delisted/inactive ticker still often returns a minimal shell
+        # record with just 'symbol' present (quoteType 'NONE', no price or
+        # market cap at all) - 'symbol' in info is not enough to tell real
+        # data from an empty shell, so check for an actual price or cap too.
+        has_real_data = (
+            info
+            and 'symbol' in info
+            and info.get('quoteType') not in (None, 'NONE')
+            and (info.get('currentPrice') or info.get('regularMarketPrice') or info.get('marketCap'))
+        )
+        if not has_real_data:
             return f"No fundamental data available for {ticker}"
-        
+
         # Extract key metrics with defaults
         company_name = info.get('longName', ticker)
         sector = info.get('sector', 'Unknown')
