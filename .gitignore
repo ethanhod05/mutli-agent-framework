@@ -55,6 +55,9 @@ temp/
 # Uncomment next line if you don't want to track data files
 # data/
 
+# Generated cache files (re-fetched automatically, no need to track)
+data/sec_ticker_cik_cache.json
+
 # OS Generated
 .DS_Store
 .DS_Store?

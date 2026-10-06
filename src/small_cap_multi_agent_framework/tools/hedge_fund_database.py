@@ -2,7 +2,13 @@
 Hedge Fund Database System with Real Market Data Integration
 ===========================================================
 
-Combines real-time market data from yfinance with local database fallback.
+Primary data source is yfinance. For tickers where yfinance's `.info`
+endpoint comes back empty (common on thinly-traded small caps - see
+sec_edgar.py's docstring), fundamentals fall back to SEC EDGAR's free XBRL
+API, and price/quote data falls back to Finnhub's free tier if a key is
+configured. Every source in the chain either returns real data or None /
+an honest "no data available" message - nothing in this file ever
+fabricates a number.
 """
 
 import sqlite3
@@ -16,6 +22,9 @@ from pathlib import Path
 from crewai.tools import tool
 import yfinance as yf
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+from small_cap_multi_agent_framework.tools.sec_edgar import get_edgar_fundamentals
+from small_cap_multi_agent_framework.tools.finnhub_fallback import get_finnhub_quote
 
 # Configure logging
 logging.basicConfig(
@@ -217,7 +226,7 @@ def _get_yfinance_fundamentals(stock, ticker: str) -> str:
             and (info.get('currentPrice') or info.get('regularMarketPrice') or info.get('marketCap'))
         )
         if not has_real_data:
-            return f"No fundamental data available for {ticker}"
+            return _get_edgar_fallback_fundamentals(stock, ticker)
 
         # Extract key metrics with defaults
         company_name = info.get('longName', ticker)
@@ -298,6 +307,105 @@ Upside Potential: {((target_price/current_price - 1)*100 if current_price > 0 el
         logger.error(f"Error processing fundamentals for {ticker}: {e}")
         return f"Limited fundamental data available for {ticker}"
 
+
+def _get_edgar_fallback_fundamentals(stock, ticker: str) -> str:
+    """Called only once yfinance's own `.info` has already come back empty.
+    Pulls raw statement data from SEC EDGAR's free XBRL API and, where
+    possible, a real last price from a direct yfinance price-history call
+    (a separate endpoint from the broken `.info` one, and sometimes still
+    populated even when `.info` isn't) or Finnhub's free tier if a key is
+    configured - so some price-derived ratios can still be computed. Any
+    figure we can't get from a real source is reported as 'n/a', never
+    estimated or interpolated."""
+    edgar = get_edgar_fundamentals(ticker)
+    if edgar is None:
+        return f"No fundamental data available for {ticker}"
+
+    current_price = None
+    price_source = None
+    try:
+        hist = stock.history(period="5d")
+        if not hist.empty:
+            current_price = float(hist['Close'].iloc[-1])
+            price_source = "yfinance price history"
+    except Exception:
+        pass
+
+    if current_price is None:
+        quote = get_finnhub_quote(ticker)
+        if quote:
+            current_price = quote["current_price"]
+            price_source = "Finnhub"
+
+    def pct(x):
+        return f"{x*100:.1f}%" if x is not None else "n/a"
+
+    def money(x):
+        return f"${x:,.0f}" if x is not None else "n/a"
+
+    revenue = edgar["revenue"]
+    net_income = edgar["net_income"]
+    gross_margin = (edgar["gross_profit"] / revenue) if edgar["gross_profit"] and revenue else None
+    operating_margin = (edgar["operating_income"] / revenue) if edgar["operating_income"] and revenue else None
+    net_margin = (net_income / revenue) if net_income and revenue else None
+    roe = (net_income / edgar["equity"]) if net_income and edgar["equity"] else None
+    roa = (net_income / edgar["assets"]) if net_income and edgar["assets"] else None
+    current_ratio = (
+        edgar["current_assets"] / edgar["current_liabilities"]
+        if edgar["current_assets"] and edgar["current_liabilities"] else None
+    )
+    debt_to_equity = (edgar["total_debt"] / edgar["equity"]) if edgar["total_debt"] and edgar["equity"] else None
+
+    market_cap = None
+    pe_ratio = None
+    if current_price:
+        if edgar["shares_outstanding"]:
+            market_cap = current_price * edgar["shares_outstanding"]
+        if edgar["eps_diluted"]:
+            pe_ratio = current_price / edgar["eps_diluted"]
+
+    price_note = (
+        f"plus a real last price from {price_source}" if current_price
+        else "- no live price was available from any free source, so price-derived figures are n/a"
+    )
+
+    return f"""
+═══════════════════════════════════════════════════════════════
+FUNDAMENTAL ANALYSIS - {ticker} (SEC EDGAR FALLBACK)
+yfinance had no usable data for this ticker. The figures below come
+directly from {ticker}'s own SEC filings (XBRL, as of {edgar['as_of'] or 'most recent filing'}) {price_note}.
+═══════════════════════════════════════════════════════════════
+
+FROM SEC FILINGS (annual, unless this filer has no 10-K on record yet):
+Revenue: {money(revenue)}
+Revenue Growth (YoY): {pct(edgar['revenue_growth'])}
+Net Income: {money(net_income)}
+Earnings Growth (YoY): {pct(edgar['earnings_growth'])}
+Gross Margin: {pct(gross_margin)}
+Operating Margin: {pct(operating_margin)}
+Net Margin: {pct(net_margin)}
+ROE: {pct(roe)}
+ROA: {pct(roa)}
+Total Assets: {money(edgar['assets'])}
+Total Liabilities: {money(edgar['liabilities'])}
+Stockholders' Equity: {money(edgar['equity'])}
+Cash: {money(edgar['cash'])}
+Total Debt: {money(edgar['total_debt'])}
+Current Ratio: {f"{current_ratio:.2f}" if current_ratio else "n/a"}
+Debt/Equity: {f"{debt_to_equity:.2f}" if debt_to_equity else "n/a"}
+Shares Outstanding: {f"{edgar['shares_outstanding']:,.0f}" if edgar['shares_outstanding'] else "n/a"}
+Diluted EPS: {f"${edgar['eps_diluted']:.2f}" if edgar['eps_diluted'] else "n/a"}
+
+PRICE-DERIVED (source: {price_source or "unavailable"}):
+Current Price: {f"${current_price:.2f}" if current_price else "n/a"}
+Market Cap: {money(market_cap)}
+P/E Ratio (derived): {f"{pe_ratio:.2f}" if pe_ratio else "n/a"}
+
+NOTE: No analyst price target is available from these free sources (that
+requires a paid data feed) - do not state or imply one for this ticker.
+"""
+
+
 def _get_yfinance_news(stock, ticker: str) -> str:
     """Get news data from YFinance."""
     try:
@@ -347,8 +455,26 @@ def _get_yfinance_market(stock, ticker: str) -> str:
         history = stock.history(period="1mo")
         
         if history.empty:
-            return f"No market data available for {ticker}"
-        
+            quote = get_finnhub_quote(ticker)
+            if quote is None:
+                return f"No market data available for {ticker}"
+            return f"""
+═══════════════════════════════════════════════════════════════
+MARKET DATA - {ticker} (FINNHUB FALLBACK)
+yfinance had no price history for this ticker. {datetime.now().strftime('%Y-%m-%d %H:%M')}
+═══════════════════════════════════════════════════════════════
+
+PRICE INFORMATION:
+Current Price: ${quote['current_price']:.2f}
+Previous Close: ${quote['prev_close']:.2f}
+Day High: ${quote['day_high']:.2f}
+Day Low: ${quote['day_low']:.2f}
+Open: ${quote['open']:.2f}
+
+NOTE: Volume, beta, and 52-week range aren't available from Finnhub's free
+quote endpoint - reported as n/a rather than estimated.
+"""
+
         current_price = history['Close'].iloc[-1]
         volume = history['Volume'].iloc[-1]
         
