@@ -255,6 +255,9 @@ def get_replay(execution_id: str):
     thesis_path = OUTPUT_DIR / f"thesis_eval_{execution_id}.json"
     thesis_result = json.loads(thesis_path.read_text()) if thesis_path.exists() else {}
 
+    trajectory_path = OUTPUT_DIR / f"trajectory_eval_{execution_id}.json"
+    trajectory_result = json.loads(trajectory_path.read_text()) if trajectory_path.exists() else {}
+
     attempt1_exists = (OUTPUT_DIR / f"alpha_investment_report_{execution_id}_attempt1.md").exists()
 
     tickers = []
@@ -291,6 +294,12 @@ def get_replay(execution_id: str):
             "type": "thesis_result",
             "timestamp": summary.get("analysis_date", ""),
             **thesis_result,
+        })
+    if trajectory_result:
+        replay.append({
+            "type": "trajectory_result",
+            "timestamp": summary.get("analysis_date", ""),
+            **trajectory_result,
         })
     replay.append({
         "type": "analysis_complete",

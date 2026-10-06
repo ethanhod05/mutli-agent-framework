@@ -19,6 +19,7 @@ from small_cap_multi_agent_framework.utils.tracing import RunTracer
 from small_cap_multi_agent_framework.evals.grounding import evaluate_grounding
 from small_cap_multi_agent_framework.evals.thesis_consistency import evaluate_thesis_consistency
 from small_cap_multi_agent_framework.evals.outcomes import extract_calls_for_logging, log_outcomes
+from small_cap_multi_agent_framework.evals.trajectory import evaluate_trajectory
 import json
 import logging
 from datetime import datetime
@@ -177,10 +178,22 @@ class InstitutionalAnalysisCrew:
                 self._emit("grounding_result", **eval_result)
                 self._emit("thesis_result", **thesis_result)
 
+            # Computed after any retry so it reflects the complete, final
+            # trace (a retry can only add a zero-tool-call synthesis segment,
+            # so this can't flip pass/fail either way - but the saved record
+            # should still describe everything that actually happened).
+            trajectory_result = self._run_trajectory_eval()
+            self._emit("trajectory_result", **trajectory_result)
+            if not trajectory_result["trajectory_passed"]:
+                logger.warning(
+                    f"Trajectory check failed - {trajectory_result['severity']}: "
+                    f"{trajectory_result['repeated_call_tickers']}"
+                )
+
             if not self._grounding_failed(eval_result):
                 self._log_call_outcomes()
 
-            summary = self._generate_execution_summary(start_time, eval_result, thesis_result)
+            summary = self._generate_execution_summary(start_time, eval_result, thesis_result, trajectory_result)
             self._log_run_history(summary, eval_result, thesis_result)
 
             logger.info("=" * 80)
@@ -202,13 +215,31 @@ class InstitutionalAnalysisCrew:
         except Exception as e:
             error_msg = str(e)
             logger.error(f"Analysis failed: {error_msg}")
-            self._emit("analysis_failed", error=error_msg)
+
+            # Even on a hard failure (e.g. the max_execution_time timeout
+            # that now bounds a repeated-tool-call loop), the trace saved so
+            # far is real diagnostic data - best-effort check it for exactly
+            # that failure mode, so the summary explains *why* it failed
+            # instead of just that it did.
+            trajectory_result = None
+            try:
+                trajectory_result = self._run_trajectory_eval()
+                if not trajectory_result["trajectory_passed"]:
+                    logger.error(
+                        f"Trajectory check on the partial trace found: "
+                        f"{trajectory_result['repeated_call_tickers']} - likely cause of the failure above"
+                    )
+            except Exception:
+                pass
+
+            self._emit("analysis_failed", error=error_msg, trajectory_result=trajectory_result)
 
             return {
                 'status': 'failed',
                 'error': error_msg,
                 'execution_id': self.execution_id,
-                'model': self.model_name
+                'model': self.model_name,
+                'trajectory_result': trajectory_result,
             }
 
     # Leaked ReAct "thought" preambles that weaker models sometimes emit before
@@ -272,6 +303,22 @@ class InstitutionalAnalysisCrew:
 
     def _thesis_failed(self, thesis_result: dict) -> bool:
         return bool(thesis_result.get("inconsistent_tickers"))
+
+    def _run_trajectory_eval(self) -> dict:
+        """Grade the PATH the agents took - not the output, which grounding
+        and thesis-consistency already cover, but whether an agent flailed
+        (repeated the same tool call) or skipped its job entirely. Computed
+        once from the full trace; unlike grounding/thesis this never needs
+        recomputing after a retry, since a synthesis-only retry (tools=[])
+        can't introduce a new tool-call violation.
+        """
+        result = evaluate_trajectory(self.tracer.events)
+
+        trajectory_file = self.output_dir / f"trajectory_eval_{self.execution_id}.json"
+        with open(trajectory_file, 'w') as f:
+            json.dump(result, f, indent=2)
+
+        return result
 
     def _build_correction_notes(self, failed_grounding: dict, failed_thesis: dict) -> str:
         notes = []
@@ -369,6 +416,9 @@ class InstitutionalAnalysisCrew:
             'ungrounded_tickers': eval_result.get('ungrounded_tickers', []),
             'thesis_consistency_rate': thesis_result.get('thesis_consistency_rate'),
             'inconsistent_tickers': thesis_result.get('inconsistent_tickers', []),
+            'trajectory_severity': summary.get('trajectory_severity'),
+            'trajectory_passed': summary.get('trajectory_passed'),
+            'repeated_call_tickers': summary.get('repeated_call_tickers', []),
             'retried': eval_result.get('retried', False),
             'grounding_passed': summary['grounding_passed'],
         }
@@ -376,7 +426,9 @@ class InstitutionalAnalysisCrew:
         with open(history_file, 'a') as f:
             f.write(json.dumps(record) + "\n")
 
-    def _generate_execution_summary(self, start_time: datetime, eval_result: dict, thesis_result: dict) -> dict:
+    def _generate_execution_summary(
+        self, start_time: datetime, eval_result: dict, thesis_result: dict, trajectory_result: dict
+    ) -> dict:
         """Generate an execution summary containing only facts derived from this run."""
 
         output_files = [
@@ -403,6 +455,10 @@ class InstitutionalAnalysisCrew:
             'thesis_consistency_rate': thesis_result.get('thesis_consistency_rate'),
             'inconsistent_tickers': thesis_result.get('inconsistent_tickers', []),
             'thesis_passed': not self._thesis_failed(thesis_result),
+            'trajectory_severity': trajectory_result.get('severity'),
+            'trajectory_passed': trajectory_result.get('trajectory_passed'),
+            'repeated_call_tickers': trajectory_result.get('repeated_call_tickers', []),
+            'total_tool_calls_in_trajectory': trajectory_result.get('total_tool_calls'),
         }
 
         summary_file = self.output_dir / f"execution_summary_{self.execution_id}.json"
@@ -444,6 +500,12 @@ def run_institutional_analysis(input_file: str = None, tickers: list = None, on_
             print(f"Thesis consistency: PASSED ({summary['thesis_consistency_rate'] * 100:.0f}%)")
         else:
             print(f"Thesis consistency: FAILED even after retry - inconsistent calls: {summary['inconsistent_tickers']}")
+
+        if summary['trajectory_passed']:
+            print(f"Trajectory: PASSED ({summary['trajectory_severity']}, "
+                  f"{summary['total_tool_calls_in_trajectory']} tool calls)")
+        else:
+            print(f"Trajectory: FAILED - agent repeated/skipped a tool call for: {summary['repeated_call_tickers']}")
 
         print("\nGENERATED REPORTS:")
         for output_file in summary['output_files']:

@@ -696,6 +696,42 @@ function updateThesisMeter(thesisResult) {
   }
 }
 
+const trajectoryWrap = document.getElementById('trajectory-meter-wrap');
+const trajectoryBar = document.getElementById('trajectory-bar');
+const trajectoryText = document.getElementById('trajectory-text');
+
+// Severity isn't a 0-100 rate like grounding/thesis - it's ok/warn/fail - so
+// the bar maps discrete severity to a width instead of a computed percentage.
+const TRAJECTORY_BAR_WIDTH = { ok: 100, warn: 60, fail: 20 };
+
+function updateTrajectoryMeter(trajectoryResult) {
+  trajectoryWrap.classList.remove('hidden');
+  const severity = trajectoryResult.severity || 'ok';
+
+  trajectoryBar.style.width = `${TRAJECTORY_BAR_WIDTH[severity] ?? 100}%`;
+  trajectoryBar.classList.remove('warn', 'bad');
+  if (severity === 'fail') trajectoryBar.classList.add('bad');
+  else if (severity === 'warn') trajectoryBar.classList.add('warn');
+
+  const calls = trajectoryResult.total_tool_calls ?? 0;
+  const tasks = trajectoryResult.total_tasks ?? 0;
+  trajectoryText.textContent = `${calls} tool call${calls === 1 ? '' : 's'} across ${tasks} task${tasks === 1 ? '' : 's'}`
+    + (severity !== 'ok' ? ` - ${severity}` : '');
+
+  if (trajectoryResult.repeated_call_tickers && trajectoryResult.repeated_call_tickers.length) {
+    log(`⚠ an agent repeated or skipped a tool call for: ${trajectoryResult.repeated_call_tickers.join(', ')}`, 'log-warn');
+  }
+
+  // Flag whichever specific agent(s) the violation actually belongs to,
+  // not just the portfolio manager - trajectory problems happen during data
+  // gathering, before synthesis even starts.
+  (trajectoryResult.segments || []).forEach(seg => {
+    if (!seg.violations || !seg.violations.length) return;
+    const agentDef = AGENTS.find(a => a.role === seg.agent);
+    if (agentDef) flag(agentDef.key);
+  });
+}
+
 const reportEmpty = document.getElementById('report-empty');
 const reportContent = document.getElementById('report-content');
 const downloadBtn = document.getElementById('download-btn');
@@ -867,6 +903,10 @@ function handleEvent(evt) {
       updateThesisMeter(evt);
       break;
     }
+    case 'trajectory_result': {
+      updateTrajectoryMeter(evt);
+      break;
+    }
     case 'analysis_complete': {
       clearAllActive();
       sessionRuns++;
@@ -885,6 +925,13 @@ function handleEvent(evt) {
       sfx.error();
       statusLine.textContent = 'Analysis failed.';
       log(`✗ ${evt.error}`, 'log-error');
+      // crew.py best-effort checks the partial trace for a trajectory
+      // problem even on a hard failure - if it found one, that's very
+      // likely *why* this failed (e.g. a repeated-tool-call loop that hit
+      // the max_execution_time safety net), so surface it explicitly.
+      if (evt.trajectory_result && !evt.trajectory_result.trajectory_passed) {
+        log(`  likely cause: agent repeated/skipped a tool call for ${evt.trajectory_result.repeated_call_tickers.join(', ')}`, 'log-warn');
+      }
       setButtonsEnabled(true);
       break;
     }
@@ -906,6 +953,7 @@ function resetRunUI() {
   clearAllActive();
   groundingWrap.classList.add('hidden');
   thesisWrap.classList.add('hidden');
+  trajectoryWrap.classList.add('hidden');
   reportContent.classList.add('hidden');
   downloadBtn.classList.add('hidden');
   currentReportText = '';

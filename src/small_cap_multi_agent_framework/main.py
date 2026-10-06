@@ -211,9 +211,10 @@ class SmallCapAnalysisSystem:
         summary = results.get('summary', {})
         grounding_passed = summary.get('grounding_passed', True)
         thesis_passed = summary.get('thesis_passed', True)
+        trajectory_passed = summary.get('trajectory_passed', True)
 
         print("=" * 80)
-        if grounding_passed and thesis_passed:
+        if grounding_passed and thesis_passed and trajectory_passed:
             print("🎯 INSTITUTIONAL ANALYSIS COMPLETED - ALL QUALITY CHECKS PASSED")
         else:
             print("⚠️  ANALYSIS COMPLETED BUT A QUALITY CHECK FAILED EVEN AFTER RETRY - REVIEW BEFORE TRUSTING")
@@ -235,6 +236,11 @@ class SmallCapAnalysisSystem:
             print(f"✅ Thesis consistency: {summary['thesis_consistency_rate'] * 100:.0f}%")
             if summary.get('inconsistent_tickers'):
                 print(f"⚠️  Calls that don't match their own fundamentals: {summary['inconsistent_tickers']}")
+        if 'trajectory_severity' in summary:
+            print(f"✅ Trajectory: {summary['trajectory_severity']} "
+                  f"({summary.get('total_tool_calls_in_trajectory', 0)} tool calls)")
+            if summary.get('repeated_call_tickers'):
+                print(f"⚠️  Agent repeated/skipped a tool call for: {summary['repeated_call_tickers']}")
         print()
 
         print("📋 GENERATED REPORTS:")

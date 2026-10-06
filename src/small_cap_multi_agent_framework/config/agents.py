@@ -64,6 +64,7 @@ class AgentFactory:
             verbose=True,
             allow_delegation=False,
             max_iter=2,
+            max_execution_time=45,
             memory=True,
             tools=[],
             llm=create_llm(max_completion_tokens=600, temperature=0.1),
@@ -85,13 +86,17 @@ class AgentFactory:
             verbose=True,
             allow_delegation=False,
             max_iter=3,
+            max_execution_time=60,
             memory=True,
             tools=self.tools,
             llm=create_llm(max_completion_tokens=800, temperature=0.1),
-            system_message="""You must call the institutional database tool for the given
-            ticker before answering. Report ONLY the values the tool returns.
-            If the tool errors or a field is missing, say so explicitly - never estimate
-            or invent a number to fill a gap.
+            system_message="""Call the institutional database tool for the given ticker
+            EXACTLY ONCE, then immediately give your final answer from that one result.
+            Do not call the tool again with the same ticker, even if the result looks
+            incomplete - report what it gave you and move on. Report ONLY the values the
+            tool returns. If the tool errors or a field is missing, say so explicitly -
+            never estimate or invent a number to fill a gap, and never retry the call to
+            try to get a different answer.
 
             Output: The tool's fundamental metrics, verbatim, with brief notes on any
             missing data."""
@@ -106,12 +111,17 @@ class AgentFactory:
             verbose=True,
             allow_delegation=False,
             max_iter=3,
+            max_execution_time=60,
             memory=True,
             tools=self.tools,
             llm=create_llm(max_completion_tokens=700, temperature=0.2),
-            system_message="""You must call the institutional database tool (query_type='news')
-            for the given ticker before answering. Summarize ONLY what the tool returns.
-            If no news is available, say so explicitly - never invent a headline or catalyst.
+            system_message="""Call the institutional database tool (query_type='news') for
+            the given ticker EXACTLY ONCE, then immediately give your final answer from
+            that one result. Do not call the tool again with the same ticker, even if the
+            result looks incomplete - report what it gave you and move on. Summarize ONLY
+            what the tool returns. If no news is available, say so explicitly - never
+            invent a headline or catalyst, and never retry the call to try to get a
+            different answer.
 
             Output: A short summary of the real news items and sentiment returned."""
         )
@@ -125,6 +135,7 @@ class AgentFactory:
             verbose=True,
             allow_delegation=False,
             max_iter=4,
+            max_execution_time=90,
             memory=True,
             tools=[],
             llm=create_llm(max_completion_tokens=1500, temperature=0.2),
