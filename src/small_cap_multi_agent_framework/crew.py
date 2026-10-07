@@ -20,6 +20,7 @@ from small_cap_multi_agent_framework.evals.grounding import evaluate_grounding
 from small_cap_multi_agent_framework.evals.thesis_consistency import evaluate_thesis_consistency
 from small_cap_multi_agent_framework.evals.outcomes import extract_calls_for_logging, log_outcomes
 from small_cap_multi_agent_framework.evals.trajectory import evaluate_trajectory
+from small_cap_multi_agent_framework.evals.data_health import run_data_source_health_check
 import json
 import logging
 from datetime import datetime
@@ -85,6 +86,35 @@ class InstitutionalAnalysisCrew:
                 raise Exception(f"Agent validation failed: {agent}")
 
         logger.info(f"System health check passed - Ready with {self.model_name}")
+        self._check_data_source_health()
+
+    def _check_data_source_health(self):
+        """Live check that the real data sources are actually working right
+        now, against a canary ticker - independent of whatever tickers this
+        run is about to analyze. Non-blocking by design: a degraded source
+        (primary down, fallback covering it) or even a fully failed one
+        shouldn't stop an analysis the way a missing OPENAI_API_KEY would,
+        but it SHOULD be loud and on the record, since this is exactly the
+        kind of thing that otherwise only gets noticed days later as
+        silence in the UI (the real 2026-09-28 Yahoo news outage)."""
+        try:
+            health = run_data_source_health_check()
+        except Exception as e:
+            logger.warning(f"Data-source health check itself failed to run: {e}")
+            return
+
+        if health["overall"] == "ok":
+            logger.info("Data-source health check: OK - all sources responding")
+        elif health["overall"] == "degraded":
+            degraded = [name for name, cap in health["coverage"].items() if cap["status"] == "degraded"]
+            logger.warning(f"Data-source health check: DEGRADED - covered by fallback for: {degraded}")
+        else:
+            failed = [name for name, cap in health["coverage"].items() if cap["status"] == "fail"]
+            logger.error(f"Data-source health check: FAIL - no working source (primary or fallback) for: {failed}")
+
+        health_path = self.output_dir / f"data_health_{self.execution_id}.json"
+        health_path.write_text(json.dumps(health, indent=2))
+        self._emit("data_health_result", **health)
 
     def create_institutional_crew(self) -> Crew:
         """Create the crew. Data flows via explicit task context, not delegation."""
