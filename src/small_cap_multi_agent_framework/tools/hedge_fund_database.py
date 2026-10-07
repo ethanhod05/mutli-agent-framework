@@ -24,7 +24,7 @@ import yfinance as yf
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 from small_cap_multi_agent_framework.tools.sec_edgar import get_edgar_fundamentals
-from small_cap_multi_agent_framework.tools.finnhub_fallback import get_finnhub_quote
+from small_cap_multi_agent_framework.tools.finnhub_fallback import get_finnhub_quote, get_finnhub_news
 
 # Configure logging
 logging.basicConfig(
@@ -410,10 +410,10 @@ def _get_yfinance_news(stock, ticker: str) -> str:
     """Get news data from YFinance."""
     try:
         news = stock.news
-        
+
         if not news:
-            return f"No recent news available for {ticker}"
-        
+            return _get_finnhub_fallback_news(ticker)
+
         news_output = f"""
 ═══════════════════════════════════════════════════════════════
 NEWS & SENTIMENT - {ticker} (REAL-TIME)
@@ -446,7 +446,43 @@ RECENT NEWS:
         
     except Exception as e:
         logger.error(f"Error getting news for {ticker}: {e}")
+        return _get_finnhub_fallback_news(ticker)
+
+
+def _get_finnhub_fallback_news(ticker: str) -> str:
+    """Called when yfinance's own news endpoint returns nothing or errors.
+    As of 2026-09-28 this is Yahoo's own outage - the endpoint yfinance
+    posts to (finance.yahoo.com/xhr/ncp) now 404s for every ticker, not
+    just thin small caps, confirmed directly via yfinance's debug mode
+    against AAPL/TSLA/MSFT - so this fallback is the default path for
+    EVERY ticker right now, not a rare edge case. Headlines come from
+    Finnhub's free company-news endpoint; sentiment is still scored by
+    this project's own finance-tuned VADER classifier, not Finnhub's, so
+    results stay consistent with the yfinance-sourced path."""
+    articles = get_finnhub_news(ticker)
+    if not articles:
         return f"No recent news available for {ticker}"
+
+    news_output = f"""
+═══════════════════════════════════════════════════════════════
+NEWS & SENTIMENT - {ticker} (FINNHUB FALLBACK)
+yfinance's news endpoint is currently down (a Yahoo-side outage affecting
+every ticker, not a per-symbol gap) | {datetime.now().strftime('%Y-%m-%d %H:%M')}
+═══════════════════════════════════════════════════════════════
+
+RECENT NEWS:
+"""
+    for i, article in enumerate(articles, 1):
+        sentiment, score = _classify_sentiment(article["title"])
+        news_output += f"""
+{i}. {article['title']}
+   Publisher: {article['publisher']}
+   Date: {article['date']}
+   Sentiment: {sentiment} (score: {score:+.2f})
+   Link: {article['link']}
+"""
+    return news_output
+
 
 def _get_yfinance_market(stock, ticker: str) -> str:
     """Get market data from YFinance."""
