@@ -8,8 +8,9 @@ agent delegation, so the data path is inspectable and reproducible.
 """
 
 from crewai import Crew, Process
+from crewai.types.usage_metrics import UsageMetrics
 from small_cap_multi_agent_framework.config.agents import (
-    data_cleaner, data_enricher, news_scanner, alpha_analyst, MODEL_NAME
+    data_cleaner, data_enricher, news_scanner, alpha_analyst, MODEL_NAME, PROMPT_VERSION
 )
 from small_cap_multi_agent_framework.config.tasks import (
     create_professional_task_workflow, create_alpha_generation_task
@@ -21,6 +22,7 @@ from small_cap_multi_agent_framework.evals.thesis_consistency import evaluate_th
 from small_cap_multi_agent_framework.evals.outcomes import extract_calls_for_logging, log_outcomes
 from small_cap_multi_agent_framework.evals.trajectory import evaluate_trajectory
 from small_cap_multi_agent_framework.evals.data_health import run_data_source_health_check
+from small_cap_multi_agent_framework.utils.cost import usage_summary
 import json
 import logging
 from datetime import datetime
@@ -187,6 +189,9 @@ class InstitutionalAnalysisCrew:
             result = self.crew.kickoff(inputs=inputs)
             self._strip_leaked_thought_from_report()
 
+            total_usage = UsageMetrics()
+            total_usage.add_usage_metrics(result.token_usage)
+
             eval_result = self._run_grounding_eval()
             self._emit("grounding_result", **eval_result)
 
@@ -204,7 +209,8 @@ class InstitutionalAnalysisCrew:
                     ungrounded_tickers=eval_result["ungrounded_tickers"],
                     inconsistent_tickers=thesis_result["inconsistent_tickers"],
                 )
-                eval_result, thesis_result = self._retry_synthesis_with_correction(eval_result, thesis_result)
+                eval_result, thesis_result, retry_usage = self._retry_synthesis_with_correction(eval_result, thesis_result)
+                total_usage.add_usage_metrics(retry_usage)
                 self._emit("grounding_result", **eval_result)
                 self._emit("thesis_result", **thesis_result)
 
@@ -223,7 +229,7 @@ class InstitutionalAnalysisCrew:
             if not self._grounding_failed(eval_result):
                 self._log_call_outcomes()
 
-            summary = self._generate_execution_summary(start_time, eval_result, thesis_result, trajectory_result)
+            summary = self._generate_execution_summary(start_time, eval_result, thesis_result, trajectory_result, total_usage)
             self._log_run_history(summary, eval_result, thesis_result)
 
             logger.info("=" * 80)
@@ -383,6 +389,10 @@ class InstitutionalAnalysisCrew:
         Reuses the already-executed context tasks (fundamentals/news/quality) via
         crewai's context mechanism, which just reads their cached `.output` - so
         this makes no new tool calls and costs one extra LLM call, not a full re-run.
+
+        Returns (new_grounding, new_thesis, retry_token_usage) - the usage is
+        returned rather than merged here so the caller's running total stays
+        the single source of truth for the whole run's cost.
         """
         report_path = self.output_dir / f"alpha_investment_report_{self.execution_id}.md"
         if report_path.exists():
@@ -403,7 +413,7 @@ class InstitutionalAnalysisCrew:
             step_callback=self.tracer.on_step,
             task_callback=self.tracer.on_task_complete,
         )
-        retry_crew.kickoff()
+        retry_result = retry_crew.kickoff()
         self._strip_leaked_thought_from_report()
 
         new_grounding = self._run_grounding_eval()
@@ -415,7 +425,7 @@ class InstitutionalAnalysisCrew:
 
         fixed = not (self._grounding_failed(new_grounding) or self._thesis_failed(new_thesis))
         logger.info(f"Retry {'fixed' if fixed else 'did not fully fix'} the quality check failure")
-        return new_grounding, new_thesis
+        return new_grounding, new_thesis, retry_result.token_usage
 
     def _log_call_outcomes(self) -> None:
         """Log each real BUY/HOLD/SELL call with its real price-at-call, for
@@ -446,18 +456,23 @@ class InstitutionalAnalysisCrew:
             'ungrounded_tickers': eval_result.get('ungrounded_tickers', []),
             'thesis_consistency_rate': thesis_result.get('thesis_consistency_rate'),
             'inconsistent_tickers': thesis_result.get('inconsistent_tickers', []),
+            'thesis_passed': summary.get('thesis_passed'),
             'trajectory_severity': summary.get('trajectory_severity'),
             'trajectory_passed': summary.get('trajectory_passed'),
             'repeated_call_tickers': summary.get('repeated_call_tickers', []),
             'retried': eval_result.get('retried', False),
             'grounding_passed': summary['grounding_passed'],
+            'prompt_version': summary.get('prompt_version'),
+            'total_tokens': summary.get('total_tokens'),
+            'estimated_cost_usd': summary.get('estimated_cost_usd'),
         }
         history_file = self.output_dir / "run_history.jsonl"
         with open(history_file, 'a') as f:
             f.write(json.dumps(record) + "\n")
 
     def _generate_execution_summary(
-        self, start_time: datetime, eval_result: dict, thesis_result: dict, trajectory_result: dict
+        self, start_time: datetime, eval_result: dict, thesis_result: dict, trajectory_result: dict,
+        total_usage: UsageMetrics = None,
     ) -> dict:
         """Generate an execution summary containing only facts derived from this run."""
 
@@ -474,6 +489,7 @@ class InstitutionalAnalysisCrew:
             'agent_count': len(self.crew.agents) if self.crew else 0,
             'task_count': len(self.crew.tasks) if self.crew else 0,
             'model': self.model_name,
+            'prompt_version': PROMPT_VERSION,
             'elapsed_seconds': round((datetime.now() - start_time).total_seconds(), 1),
             'tool_calls_made': len(self.tracer.tool_calls()),
             'trace_file': str(self.tracer.trace_file),
@@ -490,6 +506,9 @@ class InstitutionalAnalysisCrew:
             'repeated_call_tickers': trajectory_result.get('repeated_call_tickers', []),
             'total_tool_calls_in_trajectory': trajectory_result.get('total_tool_calls'),
         }
+
+        if total_usage is not None:
+            summary.update(usage_summary(total_usage, self.model_name))
 
         summary_file = self.output_dir / f"execution_summary_{self.execution_id}.json"
         with open(summary_file, 'w') as f:

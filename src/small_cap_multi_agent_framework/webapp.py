@@ -28,6 +28,7 @@ from pydantic import BaseModel
 
 from small_cap_multi_agent_framework.crew import InstitutionalAnalysisCrew
 from small_cap_multi_agent_framework.evals.outcomes import score_outcomes
+from small_cap_multi_agent_framework.evals.trends import compute_trends
 
 VALID_PERIODS = {"6mo", "1y", "2y", "5y"}
 
@@ -332,6 +333,19 @@ def get_history(limit: int = 20):
     lines = [l for l in history_file.read_text().splitlines() if l.strip()]
     records = [json.loads(l) for l in lines[-limit:]]
     return list(reversed(records))
+
+
+@app.get("/api/trends")
+def get_trends(window: int = 30):
+    """Aggregate pass rates and cost over the last `window` runs, broken
+    down by prompt version - answers "is this actually getting better"
+    without reading run_history.jsonl by hand. See evals/trends.py."""
+    history_file = OUTPUT_DIR / "run_history.jsonl"
+    if not history_file.exists():
+        return compute_trends([], window=window)
+    lines = [l for l in history_file.read_text().splitlines() if l.strip()]
+    records = [json.loads(l) for l in lines]
+    return compute_trends(records, window=window)
 
 
 def main():
