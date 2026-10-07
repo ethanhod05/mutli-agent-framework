@@ -917,6 +917,7 @@ function handleEvent(evt) {
       loadReport(currentExecutionId);
       renderPriceCharts(currentTickers);
       loadTrackRecord();
+      loadTrends();
       setButtonsEnabled(true);
       break;
     }
@@ -1368,3 +1369,81 @@ async function loadTrackRecord() {
 }
 
 loadTrackRecord();
+
+// ============================================================================
+// TREND REPORT - aggregate eval pass rates & cost over the last N runs, from
+// run_history.jsonl via /api/trends. Answers "is this actually getting
+// better" without reading the JSONL by hand - see evals/trends.py. Grouped
+// by prompt_version so a before/after prompt change is a real comparison,
+// not a guess.
+// ============================================================================
+
+const trendsContent = document.getElementById('trends-content');
+
+function rateClass(rate) {
+  if (rate == null) return 'na';
+  if (rate >= 0.9) return 'ok';
+  if (rate >= 0.7) return 'warn';
+  return 'bad';
+}
+
+function fmtRate(rate) {
+  return rate == null ? 'n/a' : `${Math.round(rate * 100)}%`;
+}
+
+function fmtCost(cost) {
+  return cost == null ? 'n/a' : `$${cost.toFixed(4)}`;
+}
+
+async function loadTrends() {
+  let data;
+  try {
+    const res = await fetch('/api/trends');
+    data = await res.json();
+  } catch (e) {
+    trendsContent.innerHTML = '<p class="report-empty">Could not load trend report.</p>';
+    return;
+  }
+
+  const o = data.overall;
+  if (!o.run_count) {
+    trendsContent.innerHTML = `<p class="report-empty">No runs logged yet - run an analysis to start building trend history.</p>`;
+    return;
+  }
+
+  let html = `
+    <div class="track-summary">
+      <div class="track-stat"><span class="big-number">${o.run_count}</span><span class="stat-caption">runs (last ${data.window})</span></div>
+      <div class="track-stat"><span class="big-number trend-rate ${rateClass(o.grounding_pass_rate)}">${fmtRate(o.grounding_pass_rate)}</span><span class="stat-caption">grounding</span></div>
+      <div class="track-stat"><span class="big-number trend-rate ${rateClass(o.thesis_pass_rate)}">${fmtRate(o.thesis_pass_rate)}</span><span class="stat-caption">thesis</span></div>
+      <div class="track-stat"><span class="big-number trend-rate ${rateClass(o.trajectory_pass_rate)}">${fmtRate(o.trajectory_pass_rate)}</span><span class="stat-caption">trajectory</span></div>
+      <div class="track-stat"><span class="big-number">${fmtCost(o.total_estimated_cost_usd)}</span><span class="stat-caption">total cost</span></div>
+      <div class="track-stat"><span class="big-number">${fmtCost(o.avg_estimated_cost_usd)}</span><span class="stat-caption">avg cost/run</span></div>
+    </div>
+  `;
+
+  const versions = Object.entries(data.by_prompt_version).sort((a, b) => b[1].run_count - a[1].run_count);
+  if (versions.length > 1) {
+    html += `
+      <table class="trends-version-table">
+        <thead><tr><th>Prompt</th><th>Runs</th><th>Grounding</th><th>Thesis</th><th>Trajectory</th><th>Avg cost</th></tr></thead>
+        <tbody>
+          ${versions.map(([version, v]) => `
+            <tr>
+              <td>${version}</td>
+              <td>${v.run_count}</td>
+              <td class="trend-rate ${rateClass(v.grounding_pass_rate)}">${fmtRate(v.grounding_pass_rate)}</td>
+              <td class="trend-rate ${rateClass(v.thesis_pass_rate)}">${fmtRate(v.thesis_pass_rate)}</td>
+              <td class="trend-rate ${rateClass(v.trajectory_pass_rate)}">${fmtRate(v.trajectory_pass_rate)}</td>
+              <td>${fmtCost(v.avg_estimated_cost_usd)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  trendsContent.innerHTML = html;
+}
+
+loadTrends();

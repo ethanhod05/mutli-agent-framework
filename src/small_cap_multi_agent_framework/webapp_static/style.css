@@ -92,7 +92,8 @@ body {
   grid-template-areas:
     "control arena  report"
     "charts  arena  report"
-    "track   track  track";
+    "track   track  track"
+    "trends  trends trends";
   gap: 20px;
   padding: 16px;
   max-width: 1400px;
@@ -105,6 +106,7 @@ body {
 .arena-panel { grid-area: arena; }
 .report-panel { grid-area: report; }
 .track-panel { grid-area: track; }
+.trends-panel { grid-area: trends; }
 
 @media (max-width: 1100px) {
   .layout {
@@ -114,7 +116,8 @@ body {
       "charts"
       "arena"
       "report"
-      "track";
+      "track"
+      "trends";
   }
 }
 
@@ -662,6 +665,23 @@ body {
 
 .track-table .correct { color: var(--green); }
 .track-table .wrong { color: var(--red); }
+
+/* ---------- Trend report ---------- */
+
+.trend-rate.ok { color: var(--green); }
+.trend-rate.warn { color: #ffb84d; }
+.trend-rate.bad { color: var(--red); }
+.trend-rate.na { color: var(--text-dim); }
+
+.trends-version-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 10px; }
+.trends-version-table th {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: normal;
+  border-bottom: 2px solid var(--border);
+  padding: 4px 8px;
+}
+.trends-version-table td { padding: 4px 8px; border-bottom: 1px solid #2a2650; }
 
 /* ---------- News sources ---------- */
 

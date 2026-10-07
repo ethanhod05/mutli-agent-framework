@@ -28,6 +28,19 @@ if not os.getenv("OPENAI_API_KEY"):
 MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 logger.info(f"Using {MODEL_NAME} for all agents")
 
+# Bump this whenever any agent's system_message, backstory, or iteration/
+# timeout guardrail changes below, so run_history.jsonl can be grouped by
+# version to answer "did this change actually help" rather than relying on
+# memory - the entire point of eval-driven development. One global counter
+# for the whole prompt set, not per-agent, since a real change (like the
+# v2 fix below) usually touches more than one agent at once anyway.
+#
+# v1 - original prompts, no max_execution_time guardrail
+# v2 - added max_execution_time to all 4 agents, and "call the tool EXACTLY
+#      ONCE, never retry" reinforcement to data_enricher/news_scanner -
+#      fix for the HROW infinite-tool-call-loop incident (2026-10-01)
+PROMPT_VERSION = "v2"
+
 
 def create_llm(max_completion_tokens=1000, temperature=0.2):
     """Create LLM instance with correct parameters for the OpenAI API."""
