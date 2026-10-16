@@ -1422,28 +1422,33 @@ async function loadTrends() {
     </div>
   `;
 
-  const versions = Object.entries(data.by_prompt_version).sort((a, b) => b[1].run_count - a[1].run_count);
-  if (versions.length > 1) {
-    html += `
-      <table class="trends-version-table">
-        <thead><tr><th>Prompt</th><th>Runs</th><th>Grounding</th><th>Thesis</th><th>Trajectory</th><th>Avg cost</th></tr></thead>
-        <tbody>
-          ${versions.map(([version, v]) => `
-            <tr>
-              <td>${version}</td>
-              <td>${v.run_count}</td>
-              <td class="trend-rate ${rateClass(v.grounding_pass_rate)}">${fmtRate(v.grounding_pass_rate)}</td>
-              <td class="trend-rate ${rateClass(v.thesis_pass_rate)}">${fmtRate(v.thesis_pass_rate)}</td>
-              <td class="trend-rate ${rateClass(v.trajectory_pass_rate)}">${fmtRate(v.trajectory_pass_rate)}</td>
-              <td>${fmtCost(v.avg_estimated_cost_usd)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    `;
-  }
+  html += renderTrendsBreakdownTable('Prompt', data.by_prompt_version);
+  html += renderTrendsBreakdownTable('Model', data.by_model);
 
   trendsContent.innerHTML = html;
+}
+
+function renderTrendsBreakdownTable(labelHeader, groups) {
+  const rows = Object.entries(groups).sort((a, b) => b[1].run_count - a[1].run_count);
+  if (rows.length < 2) return '';
+
+  return `
+    <table class="trends-version-table">
+      <thead><tr><th>${labelHeader}</th><th>Runs</th><th>Grounding</th><th>Thesis</th><th>Trajectory</th><th>Avg cost</th></tr></thead>
+      <tbody>
+        ${rows.map(([label, v]) => `
+          <tr>
+            <td>${label}</td>
+            <td>${v.run_count}</td>
+            <td class="trend-rate ${rateClass(v.grounding_pass_rate)}">${fmtRate(v.grounding_pass_rate)}</td>
+            <td class="trend-rate ${rateClass(v.thesis_pass_rate)}">${fmtRate(v.thesis_pass_rate)}</td>
+            <td class="trend-rate ${rateClass(v.trajectory_pass_rate)}">${fmtRate(v.trajectory_pass_rate)}</td>
+            <td>${fmtCost(v.avg_estimated_cost_usd)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 loadTrends();

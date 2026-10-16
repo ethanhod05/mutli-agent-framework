@@ -42,8 +42,36 @@ logger.info(f"Using {MODEL_NAME} for all agents")
 PROMPT_VERSION = "v2"
 
 
+# crewai 0.175.0's LLM wrapper always sends an output-length cap under the
+# literal key "max_tokens" (see llm.py's _prepare_completion_params), even
+# when the caller sets it via the max_completion_tokens kwarg instead -
+# it just reads whichever one is non-None and renames it to "max_tokens"
+# on the way out. That's fine for gpt-4o/gpt-4o-mini, which still accept
+# "max_tokens", but newer reasoning-tier models (confirmed on gpt-5.4-nano)
+# reject it outright: "Unsupported parameter: 'max_tokens' is not
+# supported with this model. Use 'max_completion_tokens' instead." There's
+# no way to fix the outgoing key name through this crewai version's public
+# API, so for those models this drops the cap entirely rather than sending
+# a param the API will reject - a real, visible tradeoff (no output-length
+# guardrail for this model), not a silent one. A crewai upgrade likely
+# fixes this properly, but that's a separate, deliberate change - not
+# something to bundle into testing a new model.
+_MODELS_REQUIRING_MAX_COMPLETION_TOKENS = {"gpt-5.4-nano", "gpt-5.4-mini", "gpt-5.4", "gpt-5.4-pro"}
+
+
 def create_llm(max_completion_tokens=1000, temperature=0.2):
     """Create LLM instance with correct parameters for the OpenAI API."""
+    if MODEL_NAME in _MODELS_REQUIRING_MAX_COMPLETION_TOKENS:
+        logger.warning(
+            f"{MODEL_NAME} requires 'max_completion_tokens', which this crewai version can't send "
+            f"correctly - running with NO output-length cap for this model (requested: {max_completion_tokens})"
+        )
+        return LLM(
+            model=MODEL_NAME,
+            temperature=temperature,
+            api_key=os.getenv("OPENAI_API_KEY"),
+        )
+
     return LLM(
         model=MODEL_NAME,
         temperature=temperature,
