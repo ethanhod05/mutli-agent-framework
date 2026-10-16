@@ -1,0 +1,14 @@
+{
+  "case_name": "hrow_infinite_loop",
+  "source_execution_id": "20261001_142145",
+  "promoted_at": "2026-10-16T17:40:49.868099",
+  "reason": "Agent repeated the same fundamentals call 36 times without ever completing the task - the real incident that led to adding max_execution_time to all four agents (2026-10-01)",
+  "classification": "structural",
+  "expected": {
+    "severity": "fail",
+    "trajectory_passed": false,
+    "repeated_call_tickers": [
+      "HROW"
+    ]
+  }
+}
