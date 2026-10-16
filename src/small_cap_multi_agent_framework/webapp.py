@@ -30,7 +30,19 @@ from small_cap_multi_agent_framework.crew import InstitutionalAnalysisCrew
 from small_cap_multi_agent_framework.evals.outcomes import score_outcomes
 from small_cap_multi_agent_framework.evals.trends import compute_trends
 
-VALID_PERIODS = {"6mo", "1y", "2y", "5y"}
+# Each period needs its own interval - a week-long bucket makes a 1-day
+# chart render as a single flat point, and an intraday bucket would return
+# thousands of points for a 5-year chart. 1d/1mo need intraday/daily
+# candles; the longer periods keep the original weekly bucketing.
+PERIOD_INTERVALS = {
+    "1d": "5m",
+    "1mo": "1d",
+    "6mo": "1wk",
+    "1y": "1wk",
+    "2y": "1wk",
+    "5y": "1wk",
+}
+VALID_PERIODS = set(PERIOD_INTERVALS)
 
 # Matches the exact format hedge_fund_database.py's _get_yfinance_news writes -
 # keep the two in sync. This parses the real, saved tool output (what the news
@@ -177,24 +189,28 @@ def get_report(execution_id: str):
 
 @app.get("/api/price-history/{ticker}")
 def price_history(ticker: str, period: str = "2y"):
-    """Real weekly close-price history for a ticker, for the UI chart only -
+    """Real close-price history for a ticker, for the UI chart only -
     deterministic, no LLM involved, same yfinance source the agents use."""
     if period not in VALID_PERIODS:
         return JSONResponse({"error": f"period must be one of {sorted(VALID_PERIODS)}"}, status_code=400)
 
     ticker = ticker.upper().strip()
     try:
-        hist = yf.Ticker(ticker).history(period=period, interval="1wk")
+        hist = yf.Ticker(ticker).history(period=period, interval=PERIOD_INTERVALS[period])
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=502)
 
     if hist.empty:
         return JSONResponse({"error": f"No price history available for {ticker}"}, status_code=404)
 
+    # A date-only label is useless on a 1-day chart (every point would show
+    # the same date) - show time there instead, since the date is constant.
+    label_format = "%H:%M" if period == "1d" else "%Y-%m-%d"
+
     return {
         "ticker": ticker,
         "period": period,
-        "dates": [d.strftime("%Y-%m-%d") for d in hist.index],
+        "dates": [d.strftime(label_format) for d in hist.index],
         "closes": [round(float(c), 2) for c in hist["Close"]],
     }
 
