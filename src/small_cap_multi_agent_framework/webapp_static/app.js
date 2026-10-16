@@ -1095,7 +1095,7 @@ historyPanel.addEventListener('click', (e) => {
 
 const chartsPanel = document.getElementById('charts-panel');
 const chartsGrid = document.getElementById('charts-grid');
-const PERIODS = ['6mo', '1y', '2y'];
+const PERIODS = ['1d', '1mo', '6mo', '1y', '2y'];
 
 function layoutChart(canvas, closes) {
   const dpr = window.devicePixelRatio || 1;
