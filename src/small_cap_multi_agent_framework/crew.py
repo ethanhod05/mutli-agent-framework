@@ -125,22 +125,18 @@ class InstitutionalAnalysisCrew:
         )
         self.universe = universe
 
-        # The four agents are module-level singletons reused across every run
-        # (agents.py creates them once at import time). crewai's Crew only
-        # attaches its step_callback to an agent if that agent doesn't already
-        # have one - so without this reset, only the *first* crew execution in
-        # a process ever gets its tool calls traced, and every run after that
-        # silently routes tool_call events to the first run's stale tracer.
-        # Resetting here forces crewai to re-attach this run's own tracer.
-        for agent in (data_cleaner, data_enricher, news_scanner, alpha_analyst):
-            agent.step_callback = None
-
+        # Tool-call tracing happens via RunTracer's own event-bus
+        # subscription (registered/unregistered per-run in its __init__/
+        # close()), not step_callback - so no per-agent reset is needed
+        # here the way there used to be. task_callback below is still the
+        # right mechanism for task-completion events: it's set fresh on
+        # this Crew instance each call, not cached on the agent singletons,
+        # so it never goes stale the way step_callback once did.
         crew = Crew(
             agents=[data_cleaner, data_enricher, news_scanner, alpha_analyst],
             tasks=tasks,
             process=Process.sequential,
             verbose=True,
-            step_callback=self.tracer.on_step,
             task_callback=self.tracer.on_task_complete,
         )
 
@@ -278,6 +274,13 @@ class InstitutionalAnalysisCrew:
                 'trajectory_result': trajectory_result,
             }
 
+        finally:
+            # The tracer's tool-call capture is a process-wide event-bus
+            # subscription (see RunTracer's docstring) - it MUST be torn
+            # down when this run ends, success or failure, or every later
+            # run in this process keeps accumulating listeners.
+            self.tracer.close()
+
     # Leaked ReAct "thought" preambles that weaker models sometimes emit before
     # their actual final answer, e.g. "I now can give a great answer". Purely
     # cosmetic prompt noise - stripping it doesn't touch any real data.
@@ -410,7 +413,6 @@ class InstitutionalAnalysisCrew:
             tasks=[retry_task],
             process=Process.sequential,
             verbose=True,
-            step_callback=self.tracer.on_step,
             task_callback=self.tracer.on_task_complete,
         )
         retry_result = retry_crew.kickoff()
