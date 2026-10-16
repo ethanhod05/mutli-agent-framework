@@ -15,15 +15,28 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
+from crewai.events.event_bus import crewai_event_bus
+from crewai.events.types.tool_usage_events import ToolUsageFinishedEvent
+
 logger = logging.getLogger(__name__)
 
 
 class RunTracer:
     """Captures tool calls and task outputs for one crew execution.
 
-    Wire up via crewai's Crew(step_callback=tracer.on_step,
-    task_callback=tracer.on_task_complete). Saves after every event so a
-    crash mid-run still leaves a usable partial trace.
+    Tool calls are captured via crewai's global event bus (subscribing to
+    ToolUsageFinishedEvent), not the old step_callback mechanism - as of
+    crewai 1.15, step_callback only ever fires with a bare AgentFinish (no
+    tool name/args/result attached at all), confirmed empirically by
+    logging the real object type/attrs during a live run. The event bus is
+    a process-wide singleton, so the handler registered in __init__ MUST
+    be unregistered via close() when this run ends, or every later run in
+    the same process would keep accumulating stale listeners - the exact
+    failure mode already hit once this session with step_callback on the
+    module-level agent singletons.
+
+    task_callback (still passed via Crew(task_callback=tracer.on_task_complete))
+    is unaffected by that change and keeps working as before.
 
     `on_event`, if given, is called with each event dict the moment it's
     recorded - used by the web UI to stream live agent activity without the
@@ -38,6 +51,12 @@ class RunTracer:
         self.trace_file = self.output_dir / f"trace_{execution_id}.json"
         self.events = []
         self.on_event = on_event
+        crewai_event_bus.on(ToolUsageFinishedEvent)(self._on_tool_usage_finished)
+
+    def close(self) -> None:
+        """Unregister this run's event-bus handler. Always call this when a
+        run ends (success or failure) - see the class docstring for why."""
+        crewai_event_bus.off(ToolUsageFinishedEvent, self._on_tool_usage_finished)
 
     def _record(self, event: dict) -> None:
         self.events.append(event)
@@ -45,24 +64,20 @@ class RunTracer:
         if self.on_event:
             self.on_event(event)
 
-    def on_step(self, step) -> None:
-        """crewai step_callback - fires after every agent step.
-
-        Duck-typed on purpose: crewai passes different internal object types
-        through this callback (a bare tool result, then the fuller action
-        object once the tool has run). We only care about the latter, which
-        has both `tool` and a populated `result`.
-        """
-        tool = getattr(step, "tool", None)
-        result = getattr(step, "result", None)
-        if tool and result is not None:
-            self._record({
-                "type": "tool_call",
-                "timestamp": datetime.now().isoformat(),
-                "tool": tool,
-                "tool_input": getattr(step, "tool_input", None),
-                "result": str(result)[:4000],
-            })
+    def _on_tool_usage_finished(self, source, event: ToolUsageFinishedEvent) -> None:
+        """crewai event-bus handler - fires once per completed tool call,
+        with the real tool name/args/output/agent role already attached
+        (no more duck-typing or guessing needed)."""
+        tool_args = event.tool_args
+        tool_input = json.dumps(tool_args) if isinstance(tool_args, dict) else str(tool_args)
+        self._record({
+            "type": "tool_call",
+            "timestamp": datetime.now().isoformat(),
+            "tool": event.tool_name,
+            "tool_input": tool_input,
+            "result": str(event.output)[:4000],
+            "agent_role": event.agent_role,
+        })
 
     def on_task_complete(self, output) -> None:
         """crewai task_callback - fires after each task finishes."""

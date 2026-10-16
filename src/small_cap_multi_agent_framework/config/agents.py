@@ -81,7 +81,22 @@ def create_llm(max_completion_tokens=1000, temperature=0.2):
 
 
 class AgentFactory:
-    """Factory for creating agents wired to the real database tool."""
+    """Factory for creating agents wired to the real database tool.
+
+    All agents run with memory=False. This isn't the same thing as the
+    eval-driven improvement loop (run_history.jsonl, trends, call_outcomes) -
+    that's a human-plus-eval cycle with no agent memory involved at all.
+    crewai's built-in agent memory is a separate, ungoverned semantic store:
+    confirmed live (2026-10-16) that it lets an agent pull in facts from a
+    PAST run's memory mid-task - e.g. the Senior Portfolio Manager querying
+    "AAPL has a market cap of $4,991,209,701,376" from a prior session's
+    cache - with no awareness of whether that past run was grounded,
+    whether the data's still current, or whether the call was later scored
+    right or wrong. That's a real fabrication vector against a system
+    whose entire design is "ground everything in this run's own tool
+    calls" (see crew.py's docstring on explicit context= wiring), so it's
+    off until/unless there's a curated version of it worth building.
+    """
 
     def __init__(self):
         self.tools = self._load_tools()
@@ -106,7 +121,7 @@ class AgentFactory:
             allow_delegation=False,
             max_iter=2,
             max_execution_time=45,
-            memory=True,
+            memory=False,
             tools=[],
             llm=create_llm(max_completion_tokens=600, temperature=0.1),
             system_message="""You will be given a fixed list of securities with ticker,
@@ -128,7 +143,7 @@ class AgentFactory:
             allow_delegation=False,
             max_iter=3,
             max_execution_time=60,
-            memory=True,
+            memory=False,
             tools=self.tools,
             llm=create_llm(max_completion_tokens=800, temperature=0.1),
             system_message="""Call the institutional database tool for the given ticker
@@ -153,7 +168,7 @@ class AgentFactory:
             allow_delegation=False,
             max_iter=3,
             max_execution_time=60,
-            memory=True,
+            memory=False,
             tools=self.tools,
             llm=create_llm(max_completion_tokens=700, temperature=0.2),
             system_message="""Call the institutional database tool (query_type='news') for
@@ -177,7 +192,7 @@ class AgentFactory:
             allow_delegation=False,
             max_iter=4,
             max_execution_time=90,
-            memory=True,
+            memory=False,
             tools=[],
             llm=create_llm(max_completion_tokens=1500, temperature=0.2),
             system_message="""Generate investment recommendations using ONLY the fundamental
