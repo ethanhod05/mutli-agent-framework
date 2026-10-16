@@ -1,0 +1,12 @@
+{
+  "case_name": "alpha_analyst_memory_search_violation",
+  "source_execution_id": "20261016_000827",
+  "promoted_at": "2026-10-16T17:41:15.638239",
+  "reason": "Senior Portfolio Manager made 2 search_memory tool calls, pulling in facts from a PREVIOUS session instead of only this run's context - the real incident that led to disabling memory=True on all four agents (2026-10-16)",
+  "classification": "structural",
+  "expected": {
+    "severity": "fail",
+    "trajectory_passed": false,
+    "repeated_call_tickers": []
+  }
+}
