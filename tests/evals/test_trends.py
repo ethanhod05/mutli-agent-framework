@@ -6,7 +6,7 @@ from small_cap_multi_agent_framework.evals.trends import compute_trends
 def _record(
     grounding_passed=True, thesis_passed=True, trajectory_passed=True,
     tool_calls_made=5, elapsed_seconds=30.0, estimated_cost_usd=0.01,
-    prompt_version="v2",
+    prompt_version="v2", model="gpt-4o-mini",
 ):
     return {
         "grounding_passed": grounding_passed,
@@ -16,6 +16,7 @@ def _record(
         "elapsed_seconds": elapsed_seconds,
         "estimated_cost_usd": estimated_cost_usd,
         "prompt_version": prompt_version,
+        "model": model,
     }
 
 
@@ -83,3 +84,19 @@ class TestComputeTrends:
         result = compute_trends([record])
         assert "unknown" in result["by_prompt_version"]
         assert result["by_prompt_version"]["unknown"]["run_count"] == 1
+
+    def test_groups_by_model_for_a_model_swap_comparison(self):
+        baseline = [_record(model="gpt-4o-mini", grounding_passed=True, estimated_cost_usd=0.0015)] * 5
+        candidate = [_record(model="gpt-5.4-nano", grounding_passed=True, estimated_cost_usd=0.0008)] * 5
+        result = compute_trends(baseline + candidate)
+
+        assert result["by_model"]["gpt-4o-mini"]["run_count"] == 5
+        assert result["by_model"]["gpt-4o-mini"]["avg_estimated_cost_usd"] == 0.0015
+        assert result["by_model"]["gpt-5.4-nano"]["run_count"] == 5
+        assert result["by_model"]["gpt-5.4-nano"]["avg_estimated_cost_usd"] == 0.0008
+
+    def test_missing_model_groups_as_unknown(self):
+        record = _record()
+        del record["model"]
+        result = compute_trends([record])
+        assert result["by_model"]["unknown"]["run_count"] == 1

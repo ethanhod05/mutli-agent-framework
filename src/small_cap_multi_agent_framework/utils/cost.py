@@ -37,6 +37,22 @@ PRICING_PER_TOKEN = {
         "cached_prompt": 1.25 / 1_000_000,
         "completion": 10.00 / 1_000_000,
     },
+    # Verified 2026-10-08, ahead of a model-upgrade comparison.
+    "gpt-5.4": {
+        "prompt": 2.50 / 1_000_000,
+        "cached_prompt": 0.25 / 1_000_000,
+        "completion": 15.00 / 1_000_000,
+    },
+    "gpt-5.4-mini": {
+        "prompt": 0.75 / 1_000_000,
+        "cached_prompt": 0.075 / 1_000_000,
+        "completion": 4.50 / 1_000_000,
+    },
+    "gpt-5.4-nano": {
+        "prompt": 0.20 / 1_000_000,
+        "cached_prompt": 0.02 / 1_000_000,
+        "completion": 1.25 / 1_000_000,
+    },
 }
 
 

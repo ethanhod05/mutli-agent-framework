@@ -56,23 +56,30 @@ def _summarize_group(records: List[dict]) -> Dict[str, Any]:
     }
 
 
+def _group_by(records: List[dict], field: str) -> Dict[str, List[dict]]:
+    groups: Dict[str, List[dict]] = {}
+    for r in records:
+        key = r.get(field) or "unknown"
+        groups.setdefault(key, []).append(r)
+    return groups
+
+
 def compute_trends(records: List[dict], window: int = 30) -> Dict[str, Any]:
     """`records` should be run_history.jsonl entries, oldest first (as
     they're appended) - only the most recent `window` are used. Returns an
-    overall summary plus a breakdown grouped by prompt_version, so a
-    before/after prompt-change comparison doesn't need to be computed by
-    hand."""
+    overall summary plus breakdowns grouped by prompt_version and by model,
+    so a before/after prompt change OR a model swap (e.g. comparing
+    gpt-4o-mini against a newer model) is a real side-by-side comparison
+    instead of a guess."""
     recent = records[-window:] if window else records
-
-    by_version: Dict[str, List[dict]] = {}
-    for r in recent:
-        version = r.get("prompt_version") or "unknown"
-        by_version.setdefault(version, []).append(r)
 
     return {
         "window": window,
         "overall": _summarize_group(recent),
         "by_prompt_version": {
-            version: _summarize_group(group) for version, group in by_version.items()
+            version: _summarize_group(group) for version, group in _group_by(recent, "prompt_version").items()
+        },
+        "by_model": {
+            model: _summarize_group(group) for model, group in _group_by(recent, "model").items()
         },
     }

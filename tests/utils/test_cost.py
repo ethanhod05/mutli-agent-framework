@@ -41,6 +41,10 @@ class TestEstimateCostUsd:
     def test_zero_usage_is_zero_cost(self):
         assert estimate_cost_usd(_usage(), "gpt-4o-mini") == 0.0
 
+    def test_gpt_5_4_nano_pricing(self):
+        usage = _usage(prompt_tokens=1_000_000, completion_tokens=1_000_000)
+        assert estimate_cost_usd(usage, "gpt-5.4-nano") == 0.20 + 1.25
+
     def test_cached_tokens_never_exceed_prompt_tokens_worth_of_billing(self):
         # defensive: if cached_prompt_tokens were ever inconsistent (larger
         # than prompt_tokens), uncached shouldn't go negative and silently
