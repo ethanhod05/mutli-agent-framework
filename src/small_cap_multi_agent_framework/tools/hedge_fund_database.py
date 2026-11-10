@@ -412,7 +412,7 @@ def _get_yfinance_news(stock, ticker: str) -> str:
         news = stock.news
 
         if not news:
-            return _get_finnhub_fallback_news(ticker)
+            return _get_finnhub_fallback_news(ticker, stock)
 
         news_output = f"""
 ═══════════════════════════════════════════════════════════════
@@ -446,10 +446,10 @@ RECENT NEWS:
         
     except Exception as e:
         logger.error(f"Error getting news for {ticker}: {e}")
-        return _get_finnhub_fallback_news(ticker)
+        return _get_finnhub_fallback_news(ticker, stock)
 
 
-def _get_finnhub_fallback_news(ticker: str) -> str:
+def _get_finnhub_fallback_news(ticker: str, stock=None) -> str:
     """Called when yfinance's own news endpoint returns nothing or errors.
     As of 2026-09-28 this is Yahoo's own outage - the endpoint yfinance
     posts to (finance.yahoo.com/xhr/ncp) now 404s for every ticker, not
@@ -459,7 +459,13 @@ def _get_finnhub_fallback_news(ticker: str) -> str:
     Finnhub's free company-news endpoint; sentiment is still scored by
     this project's own finance-tuned VADER classifier, not Finnhub's, so
     results stay consistent with the yfinance-sourced path."""
-    articles = get_finnhub_news(ticker)
+    company_name = None
+    try:
+        info = stock.info if stock is not None else {}
+        company_name = info.get("shortName") or info.get("longName")
+    except Exception:
+        pass
+    articles = get_finnhub_news(ticker, company_name=company_name)
     if not articles:
         return f"No recent news available for {ticker}"
 
