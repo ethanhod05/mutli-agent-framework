@@ -1,5 +1,3 @@
-# Create .gitignore file
-cat > .gitignore << 'EOF'
 # Python
 __pycache__/
 *.py[cod]
@@ -34,6 +32,7 @@ venv.bak/
 # IDE
 .vscode/settings.json
 .idea/
+*.code-workspace
 *.swp
 *.swo
 *~
@@ -44,12 +43,14 @@ venv.bak/
 config/secrets.yaml
 config/api_keys.yaml
 
-# Output Files & Logs
+# Output files, logs, and runtime artifacts
 output/
 logs/
 *.log
 final_alpha_report*.md
 temp/
+data/hedge_fund_database.db
+*.lock
 
 # Data files (optional - you might want to track sample data)
 # Uncomment next line if you don't want to track data files
@@ -57,6 +58,9 @@ temp/
 
 # Generated cache files (re-fetched automatically, no need to track)
 data/sec_ticker_cik_cache.json
+
+# Claude Code project config/skills - local tooling, not project source
+.claude/
 
 # OS Generated
 .DS_Store
@@ -79,4 +83,6 @@ htmlcov/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-EOF
+
+# Keep the template, ignore the real thing
+!.env.example
